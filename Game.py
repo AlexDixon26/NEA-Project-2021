@@ -7,8 +7,11 @@ class Game:
     Human = "Human"
     Network = "Network"
 
-    BLACK = "⚫"
-    WHITE = "⚪"
+    P2 = "⚫"
+    P1 = "⚪"
+
+    _DIM = 8
+    _EMPTY = " "
         
     def __init__(self, player1, player2):
         if player1 == Game.AI:
@@ -23,11 +26,20 @@ class Game:
             self.__player2 = Human()
         elif player2 == Game.Network:
             self.__player2 = Client()
+        self.board = [[Game._EMPTY for _ in range(Game._DIM)] for _ in range(Game._DIM)]
         
     def next_move(self):
         #tell game to play next move
         pass
 
     def finished(self):
-        #return true if finished
-        pass
+        for p in [Game.P1, Game.P2]:
+            finished = True
+            for row in range(Game._DIM):
+                for col in range(Game._DIM):
+                    if self.board[row][col] == p:
+                        finished = False
+            if finished == True:
+                return True
+        return None
+        #Do Draw Mechanics later
