@@ -3,19 +3,18 @@ from sys import argv
 
 class GUI:
     def __init__(self):
-        self.__game = Game() #Game.Ai/Human/Client,Game.Ai/Human/Client in brackets
+        self._game = Game() #Game.Ai/Human/Client,Game.Ai/Human/Client in brackets
 
     def run(self):
         pass
 
 class Terminal:
     def __init__(self):
-        self.__game = Game(Game.Human,Game.Human)
+        self._game = Game(Game.Human,Game.Human)
 
 
     def run(self):
         _ = input("PLAY (Press Any Button to continue, Ctrl + C to stop)")
-
 
 
 
