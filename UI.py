@@ -14,8 +14,7 @@ class Terminal:
 
 
     def run(self):
-        print("PLAY (Press Any Button to continue)")
-        _ = input("")
+        _ = input("PLAY (Press Any Button to continue, Ctrl + C to stop)")
 
 
 

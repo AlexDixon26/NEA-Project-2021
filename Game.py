@@ -2,6 +2,9 @@ from Client import Client
 from Human import Human
 from AI import AI
 
+class GameError(Exception):
+    pass
+
 class Game:
     AI = "AI"
     Human = "Human"
@@ -27,9 +30,15 @@ class Game:
         elif player2 == Game.Network:
             self.__player2 = Client()
         self.board = [[Game._EMPTY for _ in range(Game._DIM)] for _ in range(Game._DIM)]
+        self.__player = Game.P1
         
-    def next_move(self):
-        #tell game to play next move
+    def do_move(self, row, col):
+        row, col -= 1, 1 #row & column entered will be 1-based, code will use 0-based
+        if self._board[row][col] != Game._EMPTY:
+            raise GameError("Invalid Move")
+        self._board[row][col] = self._player
+        self._player = Game.P2 if self._player is Game.P1 else Game.P1
+
         pass
 
     def finished(self):
