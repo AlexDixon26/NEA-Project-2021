@@ -15,7 +15,7 @@ class Terminal:
 
     def run(self):
         _ = input("PLAY (Press Any Button to continue, Ctrl + C to stop)")
-
+        print(self._game)
 
 
 def usage():   

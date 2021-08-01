@@ -10,11 +10,11 @@ class Game:
     Human = "Human"
     Network = "Network"
 
-    P2 = "⚫"
-    P1 = "⚪"
+    P1 = "⚫"
+    P2 = "⚪"
 
     _DIM = 8
-    _EMPTY = " "
+    _EMPTY = "   "
         
     def __init__(self, player1, player2):
         if player1 == Game.AI:
@@ -29,20 +29,28 @@ class Game:
             self.__player2 = Human()
         elif player2 == Game.Network:
             self.__player2 = Client()
-        self._board = [[Game._EMPTY for _ in range(Game._DIM)] for _ in range(Game._DIM)]
+        self._board = [[Game._EMPTY,Game.P2,Game._EMPTY,Game.P2,Game._EMPTY,Game.P2,Game._EMPTY,Game.P2],[Game.P2,Game._EMPTY,Game.P2,Game._EMPTY,Game.P2,Game._EMPTY,Game.P2,Game._EMPTY],[Game._EMPTY,Game.P2,Game._EMPTY,Game.P2,Game._EMPTY,Game.P2,Game._EMPTY,Game.P2],[Game._EMPTY]*Game._DIM,[Game._EMPTY]*Game._DIM,[Game.P1,Game._EMPTY,Game.P1,Game._EMPTY,Game.P1,Game._EMPTY,Game.P1,Game._EMPTY],[Game._EMPTY,Game.P1,Game._EMPTY,Game.P1,Game._EMPTY,Game.P1,Game._EMPTY,Game.P1],[Game.P1,Game._EMPTY,Game.P1,Game._EMPTY,Game.P1,Game._EMPTY,Game.P1,Game._EMPTY]]
         self._player = Game.P1
         
-    def do_move(self, row, col):
+    def _do_move(self, row, col):
         row -= 1
         col -= 1 #row & column entered will be 1-based, code will use 0-based
-        if self._board[row][col] != Game._EMPTY:
-            raise GameError("Invalid Move")
         self._board[row][col] = self._player
         self._player = Game.P2 if self._player is Game.P1 else Game.P1
-
         pass
 
-    def finished(self):
+    def _get_legal_moves(self, row_of_piece, col_of_piece):
+        moves = ""
+        not_player = Game.P1 if self._player is Game.P1 else Game.P2
+        if self._board[row_of_piece][col_of_piece] == Game._EMPTY or  self._board[row_of_piece][col_of_piece] == not_player:
+            return -1
+        if self._player == Game.P1:
+            moves += row_of_piece + 1, ",", col_of_piece + 1, "  ", row_of_piece+1, ",", col_of_piece+1
+        else:
+            moves += row_of_piece - 1, ",", col_of_piece + 1, "  ", row_of_piece-1, ",", col_of_piece+1
+        return moves
+
+    def _finished(self):
         for p in [Game.P1, Game.P2]:
             finished = True
             for row in range(Game._DIM):
@@ -59,6 +67,6 @@ class Game:
         for row in range(Game._DIM):
             result += f"\n{row+1} " + "|".join(self._board[row])
             if row != Game._DIM - 1:
-                dashes = "-" * (2 * Game._DIM - 1)
+                dashes = "--" * (2 * Game._DIM - 1)
                 result += f"\n  {dashes}"
         return result
