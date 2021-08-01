@@ -32,22 +32,40 @@ class Game:
         self._board = [[Game._EMPTY,Game.P2,Game._EMPTY,Game.P2,Game._EMPTY,Game.P2,Game._EMPTY,Game.P2],[Game.P2,Game._EMPTY,Game.P2,Game._EMPTY,Game.P2,Game._EMPTY,Game.P2,Game._EMPTY],[Game._EMPTY,Game.P2,Game._EMPTY,Game.P2,Game._EMPTY,Game.P2,Game._EMPTY,Game.P2],[Game._EMPTY]*Game._DIM,[Game._EMPTY]*Game._DIM,[Game.P1,Game._EMPTY,Game.P1,Game._EMPTY,Game.P1,Game._EMPTY,Game.P1,Game._EMPTY],[Game._EMPTY,Game.P1,Game._EMPTY,Game.P1,Game._EMPTY,Game.P1,Game._EMPTY,Game.P1],[Game.P1,Game._EMPTY,Game.P1,Game._EMPTY,Game.P1,Game._EMPTY,Game.P1,Game._EMPTY]]
         self._player = Game.P1
         
-    def _do_move(self, row, col):
+    def _do_move(self, row, col, row_to_move, col_to_move):
         row -= 1
-        col -= 1 #row & column entered will be 1-based, code will use 0-based
-        self._board[row][col] = self._player
-        self._player = Game.P2 if self._player is Game.P1 else Game.P1
-        pass
+        col -= 1
+        row_to_move -= 1
+        col_to_move -= 1
+        if self._board[row][col] != Game._EMPTY:
+            self._board[row][col] = Game._EMPTY
+            self._board[row_to_move][col_to_move] = Game.P2 if self._player is Game.P1 else Game.P1
+        
+        
 
     def _get_legal_moves(self, row_of_piece, col_of_piece):
-        moves = ""
+        moves = []
         not_player = Game.P1 if self._player is Game.P1 else Game.P2
-        if self._board[row_of_piece][col_of_piece] == Game._EMPTY or  self._board[row_of_piece][col_of_piece] == not_player:
+        if self._board[row_of_piece-1][col_of_piece-1] == Game._EMPTY or  self._board[row_of_piece-1][col_of_piece-1] == not_player:
             return -1
-        if self._player == Game.P1:
-            moves += row_of_piece + 1, ",", col_of_piece + 1, "  ", row_of_piece+1, ",", col_of_piece+1
+        if row_of_piece not in [1,8]:
+            if self._player == Game.P1:
+                moves.append((row_of_piece + 1, col_of_piece - 1))
+                moves.append((row_of_piece - 1, col_of_piece - 1))
+            else:
+                moves.append((row_of_piece + 1, col_of_piece + 1))
+                moves.append((row_of_piece - 1, col_of_piece + 1))
         else:
-            moves += row_of_piece - 1, ",", col_of_piece + 1, "  ", row_of_piece-1, ",", col_of_piece+1
+            if self._player == Game.P1:
+                if row_of_piece == "1":
+                    moves.append((row_of_piece - 1, col_of_piece - 1))
+                else:
+                    moves.append((row_of_piece + 1, col_of_piece - 1))
+            else:
+                if row_of_piece == "1":
+                    moves.append((row_of_piece - 1, col_of_piece + 1))
+                else:
+                    moves.append((row_of_piece + 1, col_of_piece + 1))
         return moves
 
     def _finished(self):

@@ -16,6 +16,9 @@ class Terminal:
     def run(self):
         _ = input("PLAY (Press Any Button to continue, Ctrl + C to stop)")
         print(self._game)
+        print(self._game._get_legal_moves(3,6))
+        self._game._do_move(3,6,4,5)
+        print(self._game)
 
 
 def usage():   
