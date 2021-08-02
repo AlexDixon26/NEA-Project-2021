@@ -10,8 +10,14 @@ class Game:
     Human = "Human"
     Network = "Network"
 
-    P1 = "⚫"
-    P2 = "⚪"
+    P1 = "Black"
+    P2 = "White"
+
+
+    P1Man = "⚫"
+    P2Man = "⚪"
+    P1King = "♔"
+    P2King = "♚"
 
     _DIM = 8
     _EMPTY = "   "
@@ -37,17 +43,29 @@ class Game:
         col -= 1
         row_to_move -= 1
         col_to_move -= 1
+        if self._board[row][col] == Game.P1Man or self._board[row][col] == Game.P2Man:
+            man_or_king = "S"
+        else:
+            man_or_king = "K"
         if self._board[row][col] != Game._EMPTY:
             self._board[row][col] = Game._EMPTY
-            self._board[row_to_move][col_to_move] = Game.P2 if self._player is Game.P1 else Game.P1
+            if man_or_king == "S":
+                self._board[row_to_move][col_to_move] = Game.P2Man if self._player is Game.P1 else Game.P1Man
+            else:
+                self._board[row_to_move][col_to_move] = Game.P2King if self._player is Game.P1 else Game.P1King
         
-        
+    def check_for_new_king(self):
+           
 
     def _get_legal_moves(self, row_of_piece, col_of_piece):
         moves = []
         not_player = Game.P1 if self._player is Game.P1 else Game.P2
         if self._board[row_of_piece-1][col_of_piece-1] == Game._EMPTY or  self._board[row_of_piece-1][col_of_piece-1] == not_player:
             return -1
+        if self._board[row][col] == Game.P1Man or self._board[row][col] == Game.P2Man:
+            man_or_king = "S"
+        else:
+            man_or_king = "K"
         if row_of_piece not in [1,8]:
             if self._player == Game.P1:
                 moves.append((row_of_piece + 1, col_of_piece - 1))
@@ -66,6 +84,25 @@ class Game:
                     moves.append((row_of_piece - 1, col_of_piece + 1))
                 else:
                     moves.append((row_of_piece + 1, col_of_piece + 1))
+        if man_or_king == "K":
+            if row_of_piece not in [1,8]:
+                if self._player == Game.P1:
+                moves.append((row_of_piece + 1, col_of_piece + 1))
+                moves.append((row_of_piece - 1, col_of_piece + 1))
+            else:
+                moves.append((row_of_piece + 1, col_of_piece - 1))
+                moves.append((row_of_piece - 1, col_of_piece - 1))
+        else:
+            if self._player == Game.P1:
+                if row_of_piece == "1":
+                    moves.append((row_of_piece - 1, col_of_piece + 1))
+                else:
+                    moves.append((row_of_piece + 1, col_of_piece + 1))
+            else:
+                if row_of_piece == "1":
+                    moves.append((row_of_piece - 1, col_of_piece - 1))
+                else:
+                    moves.append((row_of_piece + 1, col_of_piece - 1))
         return moves
 
     def _finished(self):
