@@ -35,7 +35,7 @@ class Game:
             self.__player2 = Human()
         elif player2 == Game.Network:
             self.__player2 = Client()
-        self._board = [[Game._EMPTY,Game.P2Man,Game._EMPTY,Game._EMPTY,Game._EMPTY,Game._EMPTY,Game._EMPTY,Game._EMPTY],[Game._EMPTY,Game._EMPTY,Game._EMPTY,Game._EMPTY,Game._EMPTY,Game._EMPTY,Game._EMPTY,Game._EMPTY],[Game._EMPTY,Game._EMPTY,Game._EMPTY,Game._EMPTY,Game._EMPTY,Game._EMPTY,Game._EMPTY,Game._EMPTY],[Game._EMPTY]*Game._DIM,[Game._EMPTY]*Game._DIM,[Game.P1Man,Game._EMPTY,Game._EMPTY,Game._EMPTY,Game._EMPTY,Game._EMPTY,Game._EMPTY,Game._EMPTY],[Game._EMPTY,Game._EMPTY,Game._EMPTY,Game._EMPTY,Game._EMPTY,Game._EMPTY,Game._EMPTY,Game._EMPTY],[Game._EMPTY,Game._EMPTY,Game._EMPTY,Game._EMPTY,Game._EMPTY,Game._EMPTY,Game._EMPTY,Game._EMPTY]]
+        self._board = [[Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man],[Game.P2Man,Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man,Game._EMPTY],[Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man],[Game._EMPTY]*Game._DIM,[Game._EMPTY]*Game._DIM,[Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY],[Game._EMPTY,Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY,Game.P1Man],[Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY]]
         self._player = Game.P1
         
     def _do_move(self, row, col, row_to_move, col_to_move, take_used):
