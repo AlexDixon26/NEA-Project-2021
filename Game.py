@@ -69,6 +69,13 @@ class Game:
                     self._board[row_to_move][col_to_move] = Game.P1Man if self._player is Game.P1 else Game.P2Man
                     self._board[int((row_to_move + row)/2)][int((col_to_move + col)/2)] = Game._EMPTY
                     _, takes = self._get_legal_moves(row_to_move+1, col_to_move+1)
+                    if self._player == Game.P1:
+                        if row == 1:
+                            takes = 0
+                    else:
+                        if row == 6:
+                            takes = 0
+
 
                 else:
                     self._board[row_to_move][col_to_move] = Game.P1King if self._player is Game.P1 else Game.P2King
