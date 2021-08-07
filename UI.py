@@ -36,20 +36,7 @@ class Terminal:
                         print("There is a take[s] available, which you must do")
                         take_used = True
                         current_player = self._game.return_player()
-                        for i in legal_moves:
-                            result = ""
-                            for num in i:
-                                result += str(num + 1)
-                            if current_player == "Black":
-                                if int(result[0]) == int(row - 2):
-                                    print(result[0] + "," + result[1])
-                                    potential_rows.append(int(result[0]))
-                                    potential_columns.append(int(result[1]))
-                            else:
-                                if int(result[0]) == int(row + 2):
-                                    print(result[0] + "," + result[1])
-                                    potential_rows.append(int(result[0]))
-                                    potential_columns.append(int(result[1]))
+                        potential_rows, potential_columns = self.print_out_moves(legal_moves, current_player, row)
                     else:
                         for i in legal_moves:
                             result = ""
@@ -66,7 +53,38 @@ class Terminal:
                     if col_to_move not in potential_columns:
                         print("You cannot move there!")
                         raise ValueError
-                    self._game._do_move(row, col, row_to_move, col_to_move, take_used)
+                    takes = self._game._do_move(row, col, row_to_move, col_to_move, take_used)
+                    row = row_to_move
+                    col = col_to_move
+                    if takes != 0:
+                        print("Another Jump[s] is available")
+                        legal_moves, takes = self._game._get_legal_moves(row_to_move, col_to_move)
+                        potential_rows, potential_columns = self.print_out_moves(legal_moves, current_player, row_to_move)
+                        row_to_move = int(input("Enter row to move to:"))
+                        col_to_move = int(input("Enter col to move to:"))
+                        if row_to_move not in potential_rows:
+                            print("You cannot move there!")
+                            raise ValueError
+                        if col_to_move not in potential_columns:
+                            print("You cannot move there!")
+                            raise ValueError
+                        takes = self._game._do_move(row, col, row_to_move, col_to_move, take_used)
+                        row = row_to_move
+                        col = col_to_move
+                        if takes != 0:
+                            print("Another Jump[s] is available")
+                            legal_moves, takes = self._game._get_legal_moves(row, col)
+                            potential_rows, potential_columns = self.print_out_moves(legal_moves, current_player, row)
+                            row_to_move = int(input("Enter row to move to:"))
+                            col_to_move = int(input("Enter col to move to:"))
+                            if row_to_move not in potential_rows:
+                                print("You cannot move there!")
+                                raise ValueError
+                            if col_to_move not in potential_columns:
+                                print("You cannot move there!")
+                                raise ValueError
+                            takes = self._game._do_move(row, col, row_to_move, col_to_move, take_used)
+
                 except GameError:
                     print("not your piece to move!")
                 except ValueError:
@@ -76,6 +94,25 @@ class Terminal:
         print("Game Finished!")
         w = self._game.finished
         print(f"The winner was {w}")
+    
+    def print_out_moves(self, legal_moves_list, current_player, row):
+        for i in legal_moves_list:
+            potential_columns = []
+            potential_rows = []
+            result = ""
+            for num in i:
+                result += str(num + 1)
+            if current_player == "Black":
+                if int(result[0]) == int(row - 2):
+                    print(result[0] + "," + result[1])
+                    potential_rows.append(int(result[0]))
+                    potential_columns.append(int(result[1]))
+            else:
+                if int(result[0]) == int(row + 2):
+                    print(result[0] + "," + result[1])
+                    potential_rows.append(int(result[0]))
+                    potential_columns.append(int(result[1]))
+        return potential_rows, potential_columns
 
 def usage():   
     print(f"""

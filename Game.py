@@ -40,6 +40,7 @@ class Game:
         
     def _do_move(self, row, col, row_to_move, col_to_move, take_used):
         #Validation of piece being theres
+        takes = 0
         if self._player == Game.P1:
             possible = [Game.P1King,Game.P1Man]
         else: 
@@ -67,14 +68,22 @@ class Game:
                 if man_or_king == "S":
                     self._board[row_to_move][col_to_move] = Game.P1Man if self._player is Game.P1 else Game.P2Man
                     self._board[int((row_to_move + row)/2)][int((col_to_move + col)/2)] = Game._EMPTY
+                    _, takes = self._get_legal_moves(row_to_move+1, col_to_move+1)
+
                 else:
                     self._board[row_to_move][col_to_move] = Game.P1King if self._player is Game.P1 else Game.P2King
                     self._board[int((row_to_move + row)/2)][int((col_to_move + col)/2)] = Game._EMPTY
+                    print(self._board)
+                    _, takes = self._get_legal_moves(row_to_move+1,col_to_move+1)
         self.check_for_new_king()
-        if self._player == Game.P1:
-            self._player = Game.P2
+        if takes != 0:
+            return takes
         else:
-            self._player = Game.P1
+            if self._player == Game.P1:
+                self._player = Game.P2
+            else:
+                self._player = Game.P1
+            return 0
         
     def check_for_new_king(self):
         for row in range(Game._DIM):
