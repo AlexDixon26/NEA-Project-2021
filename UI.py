@@ -28,6 +28,9 @@ class Terminal:
                 try:
                     legal_moves, takes = self._game._get_legal_moves(row, col)
                     print("Legal moves for this piece: ")
+                    if len(legal_moves) == 0:
+                        takes = 0
+                        print("This piece cannot move")
                     take_used = False
                     result = ""
                     potential_rows = []
@@ -57,7 +60,8 @@ class Terminal:
                     row = row_to_move
                     col = col_to_move
                     if takes != 0:
-                        print("Another Jump[s] is available")
+                        print(self._game)
+                        print("Another Take[s] is available")
                         legal_moves, takes = self._game._get_legal_moves(row_to_move, col_to_move)
                         potential_rows, potential_columns = self.print_out_moves(legal_moves, current_player, row_to_move)
                         row_to_move = int(input("Enter row to move to:"))
@@ -72,7 +76,8 @@ class Terminal:
                         row = row_to_move
                         col = col_to_move
                         if takes != 0:
-                            print("Another Jump[s] is available")
+                            print(self._game)
+                            print("Another Take[s] is available")
                             legal_moves, takes = self._game._get_legal_moves(row, col)
                             potential_rows, potential_columns = self.print_out_moves(legal_moves, current_player, row)
                             row_to_move = int(input("Enter row to move to:"))
@@ -91,24 +96,25 @@ class Terminal:
                     continue
             else:
                 print("Row and column must be within 1 - 8")
+        print(self._game)
         print("Game Finished!")
         w = self._game.finished
         print(f"The winner was {w}")
     
     def print_out_moves(self, legal_moves_list, current_player, row):
+        potential_columns = []
+        potential_rows = []
         for i in legal_moves_list:
-            potential_columns = []
-            potential_rows = []
             result = ""
             for num in i:
                 result += str(num + 1)
             if current_player == "Black":
-                if int(result[0]) == int(row - 2):
+                if int(result[0]) == int(row - 2) or int(result[0]) == int(row + 2):
                     print(result[0] + "," + result[1])
                     potential_rows.append(int(result[0]))
                     potential_columns.append(int(result[1]))
             else:
-                if int(result[0]) == int(row + 2):
+                if int(result[0]) == int(row + 2) or int(result[0]) == int(row - 2):
                     print(result[0] + "," + result[1])
                     potential_rows.append(int(result[0]))
                     potential_columns.append(int(result[1]))
