@@ -14,10 +14,10 @@ class Game:
     P2 = "White"
 
 
-    P1Man = "⚫"
-    P2Man = "⚪"
-    P1King = "♔"
-    P2King = "♚"
+    P1Man = "⚫ "
+    P2Man = "⚪ "
+    P1King = " ♔ "
+    P2King = " ♚ "
 
     _DIM = 8
     _EMPTY = "   "
@@ -35,7 +35,7 @@ class Game:
             self.__player2 = Human()
         elif player2 == Game.Network:
             self.__player2 = Client()
-        self._board = [[Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man],[Game.P2Man,Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man,Game._EMPTY],[Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man],[Game._EMPTY]*Game._DIM,[Game._EMPTY]*Game._DIM,[Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY],[Game._EMPTY,Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY,Game.P1Man],[Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY]]
+        self._board = [[Game._EMPTY]*Game._DIM,[Game._EMPTY]*Game._DIM,[Game._EMPTY,Game._EMPTY,Game._EMPTY,Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man,Game._EMPTY],[Game._EMPTY]*Game._DIM,[Game._EMPTY,Game._EMPTY,Game._EMPTY,Game._EMPTY,Game.P2Man,Game._EMPTY,Game._EMPTY,Game._EMPTY],[Game._EMPTY]*Game._DIM,[Game._EMPTY,Game._EMPTY,Game.P2Man,Game._EMPTY,Game._EMPTY,Game._EMPTY,Game._EMPTY,Game._EMPTY],[Game._EMPTY,Game.P1Man,Game._EMPTY,Game._EMPTY,Game._EMPTY,Game._EMPTY,Game._EMPTY,Game._EMPTY]]
         self._player = Game.P1
         
     def _do_move(self, row, col, row_to_move, col_to_move, take_used):
@@ -80,8 +80,13 @@ class Game:
                 else:
                     self._board[row_to_move][col_to_move] = Game.P1King if self._player is Game.P1 else Game.P2King
                     self._board[int((row_to_move + row)/2)][int((col_to_move + col)/2)] = Game._EMPTY
-                    print(self._board)
                     _, takes = self._get_legal_moves(row_to_move+1,col_to_move+1)
+                    if self._player == Game.P1:
+                        if row_to_move == 0:
+                            takes = 0
+                    else:
+                        if row_to_move == 8:
+                            takes = 0
         self.check_for_new_king()
         if takes != 0:
             return takes
@@ -96,13 +101,13 @@ class Game:
         for row in range(Game._DIM):
                 for col in range(Game._DIM):
                     if self._player == Game.P1:
-                        if col == 8:
-                            if self._board[row][col] in [Game.P1Man]:
-                                self._board[row][col] == Game.P1King
+                        if row == 0:
+                            if self._board[row][col] == Game.P1Man:
+                                self._board[row][col] = Game.P1King
                     else:
-                        if col == 1:
-                            if self._board[row][col] in [Game.P2Man]:
-                                self._board[row][col] == Game.P2King
+                        if row == 7:
+                            if self._board[row][col] == Game.P2Man:
+                                self._board[row][col] = Game.P2King
 
 
     def _get_legal_moves(self, row_of_piece, col_of_piece):
@@ -165,7 +170,7 @@ class Game:
                         take += 1
                     else:
                         result = result
-            if self._board[row][col] == Game.P1King:
+            if self._board[row_of_piece][col_of_piece] == Game.P1King:
                 row = row_of_piece + 1
                 if col_of_piece == 0:
                     col = col_of_piece + 1
@@ -180,7 +185,7 @@ class Game:
                         else:
                             result = result
                 elif col_of_piece == 7:
-                    col = col_of_piece + 1
+                    col = col_of_piece - 1
                     if self._board[row][col] in [Game.P2Man,Game.P2King]:
                         result = result
                     elif self._board[row][col] == Game._EMPTY:
@@ -216,55 +221,7 @@ class Game:
                             result = result
         else:
             row = row_of_piece + 1
-            if col_of_piece == 0:
-                col = col_of_piece + 1
-                if self._board[row][col] in [Game.P2Man,Game.P2King]:
-                    result = result
-                elif self._board[row][col] == Game._EMPTY:
-                    result.append([row,col])
-                else:
-                    if self._board[row-1][col+1] == Game._EMPTY:
-                        result.append([row-1,col+1])
-                        take += 1
-                    else:
-                        result = result
-            elif col_of_piece == 7:
-                col = col_of_piece - 1
-                if self._board[row][col] in [Game.P2Man,Game.P2King]:
-                    result = result
-                elif self._board[row][col] == Game._EMPTY:
-                    result.append([row,col])
-                else:
-                    if self._board[row-1][col-1] == Game._EMPTY:
-                        result.append([row-1,col-1])
-                        take += 1
-                    else:
-                        result = result
-            elif col_of_piece in [1,2,3,4,5,6]:
-                col = col_of_piece - 1
-                if self._board[row][col] in [Game.P2Man,Game.P2King]:
-                    result = result
-                elif self._board[row][col] == Game._EMPTY:
-                    result.append([row,col])
-                else:
-                    if self._board[row-1][col-1] == Game._EMPTY:
-                        result.append([row-1,col-1])
-                        take += 1
-                    else:
-                        result = result
-                col = col_of_piece + 1
-                if self._board[row][col] in [Game.P2Man,Game.P2King]:
-                    result = result
-                elif self._board[row][col] == Game._EMPTY:
-                    result.append([row,col])
-                else:
-                    if self._board[row-1][col+1] == Game._EMPTY:
-                        result.append([row-1,col+1])
-                        take += 1
-                    else:
-                        result = result
-            if self._board[row_of_piece][col_of_piece] == Game.P2King:
-                row = row_of_piece - 1
+            if row in [0,1,2,3,4,5,6,7]:
                 if col_of_piece == 0:
                     col = col_of_piece + 1
                     if self._board[row][col] in [Game.P2Man,Game.P2King]:
@@ -312,6 +269,68 @@ class Game:
                             take += 1
                         else:
                             result = result
+            if self._board[row_of_piece][col_of_piece] == Game.P2King:
+                row = row_of_piece - 1
+                if row in [0,1,2,3,4,5,6,7]:
+                    if col_of_piece == 0:
+                        col = col_of_piece + 1
+                        if self._board[row][col] in [Game.P2Man,Game.P2King]:
+                            result = result
+                        elif self._board[row][col] == Game._EMPTY:
+                            result.append([row,col])
+                        else:
+                            if self._board[row-1][col+1] == Game._EMPTY:
+                                result.append([row-1,col+1])
+                                take += 1
+                            else:
+                                result = result
+                    elif col_of_piece == 7:
+                        col = col_of_piece - 1
+                        if self._board[row][col] in [Game.P2Man,Game.P2King]:
+                            result = result
+                        elif self._board[row][col] == Game._EMPTY:
+                            result.append([row,col])
+                        else:
+                            if self._board[row-1][col-1] == Game._EMPTY:
+                                result.append([row-1,col-1])
+                                take += 1
+                            else:
+                                result = result
+                    elif col_of_piece in [1,2,3,4,5,6]:
+                        col = col_of_piece - 1
+                        if self._board[row][col] in [Game.P2Man,Game.P2King]:
+                            result = result
+                        elif self._board[row][col] == Game._EMPTY:
+                            result.append([row,col])
+                        else:
+                            if self._board[row-1][col-1] == Game._EMPTY:
+                                result.append([row-1,col-1])
+                                take += 1
+                            else:
+                                result = result
+                        col = col_of_piece + 1
+                        if self._board[row][col] in [Game.P2Man,Game.P2King]:
+                            result = result
+                        elif self._board[row][col] == Game._EMPTY:
+                            result.append([row,col])
+                        else:
+                            if self._board[row-1][col+1] == Game._EMPTY:
+                                result.append([row-1,col+1])
+                                take += 1
+                            else:
+                                result = result
+        for _, move in enumerate(result):
+            if move[0] not in [0,1,2,3,4,5,6,7]:
+                result.remove(move)
+            if move[1] not in [0,1,2,3,4,5,6,7]:
+                result.remove(move)
+
+        for item in result:
+            if item[0] not in [0,1,2,3,4,5,6,7]:
+                result.remove(item)
+            if item[1] not in [0,1,2,3,4,5,6,7]:
+                result.remove(item)
+
         return result, take
 
     def whos_move(self):
@@ -322,14 +341,20 @@ class Game:
 
     @property
     def finished(self):
-        for p in [Game.P1Man, Game.P2Man, Game.P1King, Game.P2King]:
+        for p in [Game.P1Man, Game.P2Man]:
             finished = True
             for row in range(Game._DIM):
                 for col in range(Game._DIM):
                     if self._board[row][col] == p:
                         finished = False
-            if finished == False:
-                return None
+        
+        if finished == True:
+            for p in [Game.P1King, Game.P2King]:
+                finished = True
+            for row in range(Game._DIM):
+                for col in range(Game._DIM):
+                    if self._board[row][col] == p:
+                        finished = False
         if finished == True:
             return p
     
