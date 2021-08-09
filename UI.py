@@ -1,14 +1,19 @@
 from Game import Game, GameError
-from sys import argv
+from abc import ABC, abstractmethod
 
-class GUI:
+class UI(ABC):
+    @abstractmethod
+    def run(self):
+        raise NotImplementedError
+
+class GUI(UI):
     def __init__(self):
         self._game = Game() #Game.Ai/Human/Client,Game.Ai/Human/Client in brackets
 
     def run(self):
         pass
 
-class Terminal:
+class Terminal(UI):
     def __init__(self):
         self._game = Game(Game.Human,Game.Human)
 
