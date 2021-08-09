@@ -1,5 +1,7 @@
 from Game import Game, GameError
 from abc import ABC, abstractmethod
+from tkinter import END, Button, Tk, Toplevel, Frame, X, StringVar, Text,Scrollbar, LEFT, RIGHT, Y, Grid, N, S, W, E, Message
+from itertools import product
 
 class UI(ABC):
     @abstractmethod
@@ -8,10 +10,93 @@ class UI(ABC):
 
 class GUI(UI):
     def __init__(self):
-        self._game = Game() #Game.Ai/Human/Client,Game.Ai/Human/Client in brackets
+        root = Tk()
+        root.title("Draughts")
+        frame = Frame(root)
+        frame.pack()
+
+        Button(
+            frame,
+            text='Tutorials/Info',
+            command= self._help_callback).pack(fill=X)
+        
+        Button(
+            frame,
+            text='Play Game',
+            command= self._play_callback).pack(fill=X)
+        
+        Button(
+            frame,
+            text='Quit',
+            command = self._quit_callback).pack(fill=X)
+
+        self.__root = root
+
+    def _help_callback(self):
+        pass
+
+    def _quit_callback(self):
+        self.__root.quit()
+
+    def _play_callback(self):
+        self.__game = Game(Game.Human,Game.Human) #Game.Ai/Human/Client,Game.Ai/Human/Client in brackets CHANGE THIS LATER TO BE WHICHEVER IS DECIDED UPON
+        self.__finished = False
+        game_window = Toplevel(self.__root)
+        game_window.title("Draughts Board")
+        frame = Frame(game_window)
+        frame.pack()
+        self._frame = frame
+
+        self.__buttons = [[None]*8 for _ in range(8)]
+                                         
+        for row,col in product(range(8),range(8)):
+            b = StringVar()
+            b.set(self.__game.at(row+1,col+1))
+            
+            cmd = lambda r=row, c=col: self.__check_poss_moves(r,c)
+            
+            Button(frame,textvariable=b,command=cmd).grid(row=row,column=col,sticky=N+S+W+E)
+            self.__buttons[row][col] = b
+
+    def __check_poss_moves(self, row, col):
+        self.possiblerow = []
+        self.possiblecol = []
+        if self.__finished:
+            return
+        try:
+            moves, takes = self.__game._get_legal_moves(row+1, col+1)
+            for move in moves:
+                if takes != 0:
+                    if int(move[0]) == int(row - 2) or int(move[0]) == int(row + 2):
+                        self.__game.print_possible_moves(move[0]+1,move[1]+1)
+                else:
+                    self.__game.print_possible_moves(move[0]+1,move[1]+1)
+                self.possiblerow.append(move[0])
+                self.possiblecol.append(move[1])
+        except:
+            pass
+
+        for row, col in product(range(8),range(8)):
+            text = self.__game.at(row+1,col+1)
+            self.__buttons[row][col].set(text)
+
+        
+    
+    def __make_move(self, row, col):
+        if row not in self.possiblerow:
+            return
+        if col not in self.possiblecol:
+            return
+        self.__game._do_move(row+1, col+1)
+        self.__game.remove_possible_moves()
+
+        for row, col in product(range(8),range(8)):
+            text = self.__game.at(row+1,col+1)
+            self.__buttons[row][col].set(text)
 
     def run(self):
-        pass
+        self.__root.mainloop()
+
 
 class Terminal(UI):
     def __init__(self):
@@ -124,22 +209,3 @@ class Terminal(UI):
                     potential_rows.append(int(result[0]))
                     potential_columns.append(int(result[1]))
         return potential_rows, potential_columns
-
-def usage():   
-    print(f"""
-Usage: {argv[0]} [g | t]
-g : play with the GUI
-t : play with the Terminal""")
-    quit()
-
-if __name__ == "__main__":
-    if len(argv) != 2:
-        usage()
-    elif argv[1] == "t":
-        ui = Terminal()
-    elif argv[1] == "g":
-        ui = GUI()
-    else:
-        usage()
-    
-    ui.run()

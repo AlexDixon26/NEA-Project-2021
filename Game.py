@@ -18,6 +18,7 @@ class Game:
     P2Man = "⚪ "
     P1King = " ♔ "
     P2King = " ♚ "
+    POSSIBLEMOVE = "🟢"
 
     _DIM = 8
     _EMPTY = "   "
@@ -35,7 +36,7 @@ class Game:
             self.__player2 = Human()
         elif player2 == Game.Network:
             self.__player2 = Client()
-        self._board = [[Game._EMPTY]*Game._DIM,[Game._EMPTY]*Game._DIM,[Game._EMPTY,Game._EMPTY,Game._EMPTY,Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man,Game._EMPTY],[Game._EMPTY]*Game._DIM,[Game._EMPTY,Game._EMPTY,Game._EMPTY,Game._EMPTY,Game.P2Man,Game._EMPTY,Game._EMPTY,Game._EMPTY],[Game._EMPTY]*Game._DIM,[Game._EMPTY,Game._EMPTY,Game.P2Man,Game._EMPTY,Game._EMPTY,Game._EMPTY,Game._EMPTY,Game._EMPTY],[Game._EMPTY,Game.P1Man,Game._EMPTY,Game._EMPTY,Game._EMPTY,Game._EMPTY,Game._EMPTY,Game._EMPTY]]
+        self._board = [[Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man],[Game.P2Man,Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man,Game._EMPTY],[Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man],[Game._EMPTY]*Game._DIM,[Game._EMPTY]*Game._DIM,[Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY],[Game._EMPTY,Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY,Game.P1Man],[Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY]]
         self._player = Game.P1
         
     def _do_move(self, row, col, row_to_move, col_to_move, take_used):
@@ -333,8 +334,26 @@ class Game:
 
         return result, take
 
+    def print_possible_moves(self, row, col):
+        self._board[row-1][col-1] = Game.POSSIBLEMOVE
+
+    def remove_possible_moves(self):
+        for row in range(8):
+            for col in range(8):
+                if self._board[row][col] == Game.POSSIBLEMOVE:
+                    self._board[row][col] == Game._EMPTY
+
+    def do_move_gui(self,row,col,piece):
+        if self._board[row-1][col-1] == Game.POSSIBLEMOVE:
+            self._board[row-1][col-1] = piece
+
     def whos_move(self):
         return "Black to move" if self._player is Game.P1 else "White to move"
+
+    def at(self, row, col):
+        row -= 1
+        col -= 1
+        return self._board[row][col]
 
     def return_player(self):
         return self._player
