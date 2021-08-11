@@ -338,6 +338,7 @@ class Game:
         self._board[row-1][col-1] = Game.POSSIBLEMOVE
 
     def remove_possible_moves(self):
+        print("Toes")
         for row in range(8):
             for col in range(8):
                 if self._board[row][col] == Game.POSSIBLEMOVE:
