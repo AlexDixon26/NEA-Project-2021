@@ -43,7 +43,6 @@ class GUI(UI):
         self.__root.quit()
 
     def _play_callback(self):
-        print("_play_callback")
         self.__game = Game(Game.Human,Game.Human) #Game.Ai/Human/Client,Game.Ai/Human/Client in brackets CHANGE THIS LATER TO BE WHICHEVER IS DECIDED UPON
         self.__finished = False
         game_window = Toplevel(self.__root)
@@ -63,7 +62,6 @@ class GUI(UI):
         
 
     def __event_handler(self, eventno, row, col):
-        print("eventhandler")
         if eventno == 1:
             self._row_of_curr = row
             self._col_of_curr = col
@@ -74,7 +72,6 @@ class GUI(UI):
             self.__make_move(self._row_of_curr, self._col_of_curr, row, col)
 
     def __check_poss_moves(self, row, col):
-        print("_check_poss_moves")
         self.possiblerow = []
         self.possiblecol = []
         if self.__finished:
@@ -99,19 +96,15 @@ class GUI(UI):
         
     
     def __make_move(self, row, col, row_to_move, col_to_move):
-        print("_make_move")
         if row_to_move not in self.possiblerow:
-            print("Noo")
             return
         if col_to_move not in self.possiblecol:
             return
         if row_to_move in [row-2,row+2]:
             take_used = True
-        else:
+        else:   
             take_used = False
         _ = self.__game._do_move(row+1, col+1, row_to_move+1, col_to_move +1, take_used)
-        self.__game.remove_possible_moves()
-        print("Hello!")
         for row, col in product(range(8),range(8)):
             text = self.__game.at(row+1,col+1)
             self.__buttons[row][col].set(text)

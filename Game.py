@@ -69,7 +69,10 @@ class Game:
                 if man_or_king == "S":
                     self._board[row_to_move][col_to_move] = Game.P1Man if self._player is Game.P1 else Game.P2Man
                     self._board[int((row_to_move + row)/2)][int((col_to_move + col)/2)] = Game._EMPTY
-                    _, takes = self._get_legal_moves(row_to_move+1, col_to_move+1)
+                    try:
+                        _, takes = self._get_legal_moves(row_to_move+1, col_to_move+1)
+                    except:
+                        takes = 0
                     if self._player == Game.P1:
                         if row == 1:
                             takes = 0
@@ -81,7 +84,10 @@ class Game:
                 else:
                     self._board[row_to_move][col_to_move] = Game.P1King if self._player is Game.P1 else Game.P2King
                     self._board[int((row_to_move + row)/2)][int((col_to_move + col)/2)] = Game._EMPTY
-                    _, takes = self._get_legal_moves(row_to_move+1,col_to_move+1)
+                    try:
+                        _, takes = self._get_legal_moves(row_to_move+1,col_to_move+1)
+                    except:
+                        takes = 0
                     if self._player == Game.P1:
                         if row_to_move == 0:
                             takes = 0
@@ -89,6 +95,7 @@ class Game:
                         if row_to_move == 8:
                             takes = 0
         self.check_for_new_king()
+        self.remove_possible_moves()
         if takes != 0:
             return takes
         else:
@@ -124,202 +131,81 @@ class Game:
         col_of_piece -= 1
         if self._player == Game.P1:
             row = row_of_piece - 1
-            if col_of_piece == 0:
-                col = col_of_piece + 1
-                if self._board[row][col] in [Game.P1Man,Game.P1King]:
-                    result = result
-                elif self._board[row][col] == Game._EMPTY:
-                    result.append([row,col])
-                else:
-                    if self._board[row-1][col+1] == Game._EMPTY:
-                        result.append([row-1,col+1])
-                        take += 1
-                    else:
-                        result = result
-            elif col_of_piece == 7:
-                col = col_of_piece - 1
-                if self._board[row][col] in [Game.P1Man,Game.P1King]:
-                    result = result
-                elif self._board[row][col] == Game._EMPTY:
-                    result.append([row,col])
-                else:
-                    if self._board[row-1][col-1] == Game._EMPTY:
-                        result.append([row-1,col-1])
-                        take += 1
-                    else:
-                        result = result
-            elif col_of_piece in [1,2,3,4,5,6]:
-                col = col_of_piece - 1
-                if self._board[row][col] in [Game.P1Man,Game.P1King]:
-                    result = result
-                elif self._board[row][col] == Game._EMPTY:
-                    result.append([row,col])
-                else:
-                    if self._board[row-1][col-1] == Game._EMPTY:
-                        result.append([row-1,col-1])
-                        take += 1
-                    else:
-                        result = result
-                col = col_of_piece + 1
-                if self._board[row][col] in [Game.P1Man,Game.P1King]:
-                    result = result
-                elif self._board[row][col] == Game._EMPTY:
-                    result.append([row,col])
-                else:
-                    if self._board[row-1][col+1] == Game._EMPTY:
-                        result.append([row-1,col+1])
-                        take += 1
-                    else:
-                        result = result
+            if row in [0,1,2,3,4,5,6,7]:  
+                if col_of_piece in [0,1,2,3,4,5,6]:
+                    col = col_of_piece + 1
+                    if self._board[row][col] == Game._EMPTY:
+                        result.append([row,col])
+                    elif self._board[row][col] in [Game.P2Man,Game.P2King]:
+                        if self._board[row-1][col+1] == Game._EMPTY:
+                            result.append([row-1,col+1])
+                            take += 1
+                if col_of_piece in [1,2,3,4,5,6,7]:
+                    col = col_of_piece - 1
+                    if self._board[row][col] == Game._EMPTY:
+                        result.append([row,col])
+                    elif self._board[row][col] in [Game.P2Man,Game.P2King]:
+                        if self._board[row-1][col-1] == Game._EMPTY:
+                            result.append([row-1,col-1])
+                            take += 1
             if self._board[row_of_piece][col_of_piece] == Game.P1King:
                 row = row_of_piece + 1
-                if col_of_piece == 0:
-                    col = col_of_piece + 1
-                    if self._board[row][col] in [Game.P2Man,Game.P2King]:
-                        result = result
-                    elif self._board[row][col] == Game._EMPTY:
-                        result.append([row,col])
-                    else:
-                        if self._board[row-1][col+1] == Game._EMPTY:
-                            result.append([row-1,col+1])
-                            take += 1
-                        else:
-                            result = result
-                elif col_of_piece == 7:
-                    col = col_of_piece - 1
-                    if self._board[row][col] in [Game.P2Man,Game.P2King]:
-                        result = result
-                    elif self._board[row][col] == Game._EMPTY:
-                        result.append([row,col])
-                    else:
-                        if self._board[row-1][col-1] == Game._EMPTY:
-                            result.append([row-1,col-1])
-                            take += 1
-                        else:
-                            result = result
-                elif col_of_piece in [1,2,3,4,5,6]:
-                    col = col_of_piece - 1
-                    if self._board[row][col] in [Game.P2Man,Game.P2King]:
-                        result = result
-                    elif self._board[row][col] == Game._EMPTY:
-                        result.append([row,col])
-                    else:
-                        if self._board[row-1][col-1] == Game._EMPTY:
-                            result.append([row-1,col-1])
-                            take += 1
-                        else:
-                            result = result
-                    col = col_of_piece + 1
-                    if self._board[row][col] in [Game.P2Man,Game.P2King]:
-                        result = result
-                    elif self._board[row][col] == Game._EMPTY:
-                        result.append([row,col])
-                    else:
-                        if self._board[row-1][col+1] == Game._EMPTY:
-                            result.append([row-1,col+1])
-                            take += 1
-                        else:
-                            result = result
-        else:
+                if row in [0,1,2,3,4,5,6,7]:
+                    if col_of_piece in [0,1,2,3,4,5,6]:
+                        col = col_of_piece + 1
+                        if self._board[row][col] == Game._EMPTY:
+                            result.append([row,col])
+                        elif self._board[row][col] in [Game.P2Man,Game.P2King]:
+                            if self._board[row-1][col+1] == Game._EMPTY:
+                                result.append([row-1,col+1])
+                                take += 1
+                    if col_of_piece in [1,2,3,4,5,6,7]:
+                        col = col_of_piece - 1
+                        if self._board[row][col] == Game._EMPTY:
+                            result.append([row,col])
+                        elif self._board[row][col] in [Game.P2Man,Game.P2King]:
+                            if self._board[row-1][col-1] == Game._EMPTY:
+                                result.append([row-1,col-1])
+                                take += 1
+        elif self._player == Game.P2:
             row = row_of_piece + 1
             if row in [0,1,2,3,4,5,6,7]:
-                if col_of_piece == 0:
+                if col_of_piece in [0,1,2,3,4,5,6]:
                     col = col_of_piece + 1
-                    if self._board[row][col] in [Game.P2Man,Game.P2King]:
-                        result = result
-                    elif self._board[row][col] == Game._EMPTY:
+                    if self._board[row][col] == Game._EMPTY:
                         result.append([row,col])
-                    else:
-                        if self._board[row-1][col+1] == Game._EMPTY:
-                            result.append([row-1,col+1])
+                    elif self._board[row][col] in [Game.P1Man,Game.P1King]:
+                        if self._board[row+1][col+1] == Game._EMPTY:
+                            result.append([row+1,col+1])
                             take += 1
-                        else:
-                            result = result
-                elif col_of_piece == 7:
+                if col_of_piece in [1,2,3,4,5,6,7]:
                     col = col_of_piece - 1
-                    if self._board[row][col] in [Game.P2Man,Game.P2King]:
-                        result = result
-                    elif self._board[row][col] == Game._EMPTY:
+                    if self._board[row][col] == Game._EMPTY:
                         result.append([row,col])
-                    else:
-                        if self._board[row-1][col-1] == Game._EMPTY:
-                            result.append([row-1,col-1])
+                    elif self._board[row][col] in [Game.P2Man,Game.P2King]:
+                        if self._board[row+1][col-1] == Game._EMPTY:
+                            result.append([row+1,col-1])
                             take += 1
-                        else:
-                            result = result
-                elif col_of_piece in [1,2,3,4,5,6]:
-                    col = col_of_piece - 1
-                    if self._board[row][col] in [Game.P2Man,Game.P2King]:
-                        result = result
-                    elif self._board[row][col] == Game._EMPTY:
-                        result.append([row,col])
-                    else:
-                        if self._board[row-1][col-1] == Game._EMPTY:
-                            result.append([row-1,col-1])
-                            take += 1
-                        else:
-                            result = result
-                    col = col_of_piece + 1
-                    if self._board[row][col] in [Game.P2Man,Game.P2King]:
-                        result = result
-                    elif self._board[row][col] == Game._EMPTY:
-                        result.append([row,col])
-                    else:
-                        if self._board[row-1][col+1] == Game._EMPTY:
-                            result.append([row-1,col+1])
-                            take += 1
-                        else:
-                            result = result
             if self._board[row_of_piece][col_of_piece] == Game.P2King:
                 row = row_of_piece - 1
                 if row in [0,1,2,3,4,5,6,7]:
-                    if col_of_piece == 0:
+                    if col_of_piece in [0,1,2,3,4,5,6]:
                         col = col_of_piece + 1
-                        if self._board[row][col] in [Game.P2Man,Game.P2King]:
-                            result = result
-                        elif self._board[row][col] == Game._EMPTY:
+                        if self._board[row][col] == Game._EMPTY:
                             result.append([row,col])
-                        else:
-                            if self._board[row-1][col+1] == Game._EMPTY:
-                                result.append([row-1,col+1])
-                                take += 1
-                            else:
-                                result = result
-                    elif col_of_piece == 7:
+                        elif self._board[row][col] in [Game.P2Man,Game.P2King]:
+                            if self._board[row+1][col+1] == Game._EMPTY:
+                                result.append([row+1,col+1])
+                                take += 1 
+                    if col_of_piece in [1,2,3,4,5,6,7]:
                         col = col_of_piece - 1
-                        if self._board[row][col] in [Game.P2Man,Game.P2King]:
-                            result = result
-                        elif self._board[row][col] == Game._EMPTY:
+                        if self._board[row][col] == Game._EMPTY:
                             result.append([row,col])
-                        else:
-                            if self._board[row-1][col-1] == Game._EMPTY:
-                                result.append([row-1,col-1])
+                        elif self._board[row][col] in [Game.P2Man,Game.P2King]:
+                            if self._board[row+1][col-1] == Game._EMPTY:
+                                result.append([row+1,col-1])
                                 take += 1
-                            else:
-                                result = result
-                    elif col_of_piece in [1,2,3,4,5,6]:
-                        col = col_of_piece - 1
-                        if self._board[row][col] in [Game.P2Man,Game.P2King]:
-                            result = result
-                        elif self._board[row][col] == Game._EMPTY:
-                            result.append([row,col])
-                        else:
-                            if self._board[row-1][col-1] == Game._EMPTY:
-                                result.append([row-1,col-1])
-                                take += 1
-                            else:
-                                result = result
-                        col = col_of_piece + 1
-                        if self._board[row][col] in [Game.P2Man,Game.P2King]:
-                            result = result
-                        elif self._board[row][col] == Game._EMPTY:
-                            result.append([row,col])
-                        else:
-                            if self._board[row-1][col+1] == Game._EMPTY:
-                                result.append([row-1,col+1])
-                                take += 1
-                            else:
-                                result = result
+
         for _, move in enumerate(result):
             if move[0] not in [0,1,2,3,4,5,6,7]:
                 result.remove(move)
@@ -338,11 +224,10 @@ class Game:
         self._board[row-1][col-1] = Game.POSSIBLEMOVE
 
     def remove_possible_moves(self):
-        print("Toes")
         for row in range(8):
             for col in range(8):
                 if self._board[row][col] == Game.POSSIBLEMOVE:
-                    self._board[row][col] == Game._EMPTY
+                    self._board[row][col] = Game._EMPTY
 
     def do_move_gui(self,row,col,piece):
         if self._board[row-1][col-1] == Game.POSSIBLEMOVE:
