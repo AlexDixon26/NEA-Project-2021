@@ -1,6 +1,6 @@
 from Game import Game, GameError
 from abc import ABC, abstractmethod
-from tkinter import END, Button, Tk, Toplevel, Frame, X, StringVar, Text,Scrollbar, LEFT, RIGHT, Y, Grid, N, S, W, E, Message
+from tkinter import END, Button, Tk, Toplevel, Frame, X, StringVar, Text,Scrollbar, LEFT, RIGHT, Y, Grid, N, S, W, E, Message, Label
 from itertools import product
 
 class UI(ABC):
@@ -34,6 +34,15 @@ class GUI(UI):
             text='Quit',
             command = self._quit_callback).pack(fill=X)
 
+
+        console = Text(frame,height=4,width=50)
+        scroll = Scrollbar(frame)
+        scroll.pack(side=LEFT,fill=Y)
+        console.pack(side=LEFT,fill=Y)
+        
+        scroll.config(command=console.yview)
+        console.config(yscrollcommand=scroll.set)
+        self.__console = console
         self.__root = root
 
     def _help_callback(self):
@@ -60,6 +69,11 @@ class GUI(UI):
             Button(frame,textvariable=b,command=cmd).grid(row=row,column=col,sticky=N+S+W+E)
             self.__buttons[row][col] = b
         
+        self._turn = StringVar()
+        self._turn.set(f"Turn: {self.__game._player}")
+        turnlabel = Label(frame, textvariable=self._turn).grid(row=9,column=1,columnspan=2,sticky=N+S+W+E)
+
+
 
     def __event_handler(self, eventno, row, col):
         if eventno == 1:
@@ -67,17 +81,27 @@ class GUI(UI):
             self._col_of_curr = col
             self._eventno = 2
             self.__check_poss_moves(row, col)
+            self._turn.set(f"Turn: {self.__game._player}")
         elif eventno == 2:
             self._eventno = 1
             self.__make_move(self._row_of_curr, self._col_of_curr, row, col)
+            self._turn.set(f"Turn: {self.__game._player}")
 
     def __check_poss_moves(self, row, col):
         self.possiblerow = []
         self.possiblecol = []
         if self.__finished:
             return
-        #try:
-        moves, takes = self.__game._get_legal_moves(row+1, col+1)
+        #possible = self.__game.take_available()
+        #print(possible)
+        #if possible != []:
+           # self.__console.insert(END, "There is a take available, which you must do\n")
+        try:
+            moves, takes = self.__game._get_legal_moves(row+1, col+1, False)
+        except GameError:
+            self._eventno = 1
+            self.__console.insert(END, "That's not your peice to move! Pick again\n")
+            return
         for move in moves:
             if takes != 0:
                 if int(move[0]) == int(row - 2) or int(move[0]) == int(row + 2):
@@ -93,21 +117,29 @@ class GUI(UI):
             text = self.__game.at(row+1,col+1)
             self.__buttons[row][col].set(text)
 
+
         
     
     def __make_move(self, row, col, row_to_move, col_to_move):
         if row_to_move not in self.possiblerow:
+            self._eventno = 2
+            self.__console.insert(END, "Not able to move there\n")
             return
         if col_to_move not in self.possiblecol:
+            self._eventno = 2
+            self.__console.insert(END, "Not able to move there\n")
             return
+            
         if row_to_move in [row-2,row+2]:
             take_used = True
         else:   
             take_used = False
-        _ = self.__game._do_move(row+1, col+1, row_to_move+1, col_to_move +1, take_used)
+        take = self.__game._do_move(row+1, col+1, row_to_move+1, col_to_move +1, take_used)
         for row, col in product(range(8),range(8)):
             text = self.__game.at(row+1,col+1)
             self.__buttons[row][col].set(text)
+        if take != 0:
+            self.__console.insert(END,"Another take is available\n")
 
     def run(self):
         self.__root.mainloop()
@@ -131,7 +163,7 @@ class Terminal(UI):
                 continue
             if 1 <= row <= 8 and 1 <= col <= 8:
                 try:
-                    legal_moves, takes = self._game._get_legal_moves(row, col)
+                    legal_moves, takes = self._game._get_legal_moves(row, col, False)
                     print("Legal moves for this piece: ")
                     if len(legal_moves) == 0:
                         takes = 0
@@ -167,7 +199,7 @@ class Terminal(UI):
                     if takes != 0:
                         print(self._game)
                         print("Another Take[s] is available")
-                        legal_moves, takes = self._game._get_legal_moves(row_to_move, col_to_move)
+                        legal_moves, takes = self._game._get_legal_moves(row_to_move, col_to_move, False)
                         potential_rows, potential_columns = self.print_out_moves(legal_moves, current_player, row_to_move)
                         row_to_move = int(input("Enter row to move to:"))
                         col_to_move = int(input("Enter col to move to:"))
@@ -183,7 +215,7 @@ class Terminal(UI):
                         if takes != 0:
                             print(self._game)
                             print("Another Take[s] is available")
-                            legal_moves, takes = self._game._get_legal_moves(row, col)
+                            legal_moves, takes = self._game._get_legal_moves(row, col, False)
                             potential_rows, potential_columns = self.print_out_moves(legal_moves, current_player, row)
                             row_to_move = int(input("Enter row to move to:"))
                             col_to_move = int(input("Enter col to move to:"))
