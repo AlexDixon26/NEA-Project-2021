@@ -10,6 +10,7 @@ class UI(ABC):
 
 class GUI(UI):
     def __init__(self):
+        self._finished = False
         root = Tk()
         root.title("Draughts")
         frame = Frame(root)
@@ -52,6 +53,7 @@ class GUI(UI):
         self.__root.quit()
 
     def _play_callback(self):
+        self.__console.delete("1.0", END)
         self.__game = Game(Game.Human,Game.Human) #Game.Ai/Human/Client,Game.Ai/Human/Client in brackets CHANGE THIS LATER TO BE WHICHEVER IS DECIDED UPON
         self.__finished = False
         game_window = Toplevel(self.__root)
@@ -59,7 +61,8 @@ class GUI(UI):
         frame = Frame(game_window)
         frame.pack()
         self._frame = frame
-        self.__buttons = [[None]*8 for _ in range(8)]                             
+        self.__buttons = [[None]*8 for _ in range(8)]  
+        self._eventno = 1                           
         for row,col in product(range(8),range(8)):
             b = StringVar()
             b.set(self.__game.at(row+1,col+1))
@@ -81,11 +84,21 @@ class GUI(UI):
             self._col_of_curr = col
             self._eventno = 2
             self.__check_poss_moves(row, col)
-            self._turn.set(f"Turn: {self.__game._player}")
         elif eventno == 2:
+            if self._row_of_curr == row and self._col_of_curr == col:
+                self.__remove_poss()
+                return
             self._eventno = 1
             self.__make_move(self._row_of_curr, self._col_of_curr, row, col)
             self._turn.set(f"Turn: {self.__game._player}")
+
+    def __remove_poss(self):
+        self.__game.remove_possible_moves()
+
+        for row, col in product(range(8),range(8)):
+            text = self.__game.at(row+1,col+1)
+            self.__buttons[row][col].set(text)
+        self._eventno = 1
 
     def __check_poss_moves(self, row, col):
         self.possiblerow = []
@@ -140,6 +153,12 @@ class GUI(UI):
             self.__buttons[row][col].set(text)
         if take != 0:
             self.__console.insert(END,"Another take is available\n")
+
+        w = self.__game.finished()
+        if w is not None:
+            self.__finished = True
+            self.__console.insert(END, f"The winner was {w}\n")
+
 
     def run(self):
         self.__root.mainloop()

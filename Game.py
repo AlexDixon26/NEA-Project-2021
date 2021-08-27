@@ -278,6 +278,8 @@ class Game:
                         finished = False
         if finished == True:
             return p
+        else:
+            return
     
     def __repr__(self):
         result = "  " + " ".join(str(i+1)+"  " for i in range(Game._DIM))
