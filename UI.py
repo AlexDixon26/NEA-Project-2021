@@ -10,7 +10,7 @@ class UI(ABC):
 
 class GUI(UI):
     def __init__(self):
-        self._finished = False
+        self.__finished = False
         root = Tk()
         root.title("Draughts")
         frame = Frame(root)
@@ -62,7 +62,8 @@ class GUI(UI):
         frame.pack()
         self._frame = frame
         self.__buttons = [[None]*8 for _ in range(8)]  
-        self._eventno = 1                           
+        self._eventno = 1 
+        self.__game_win = game_window                          
         for row,col in product(range(8),range(8)):
             b = StringVar()
             b.set(self.__game.at(row+1,col+1))
@@ -75,10 +76,16 @@ class GUI(UI):
         self._turn = StringVar()
         self._turn.set(f"Turn: {self.__game._player}")
         turnlabel = Label(frame, textvariable=self._turn).grid(row=9,column=1,columnspan=2,sticky=N+S+W+E)
+        takes = self.__game.check_for_takes()
+        print(takes)
+        if takes != []:
+            self.__console.insert(END,"There are take[s] available", str(takes), "\n")
 
 
 
     def __event_handler(self, eventno, row, col):
+        if self.__finished:
+            return
         if eventno == 1:
             self._row_of_curr = row
             self._col_of_curr = col
@@ -91,6 +98,10 @@ class GUI(UI):
             self._eventno = 1
             self.__make_move(self._row_of_curr, self._col_of_curr, row, col)
             self._turn.set(f"Turn: {self.__game._player}")
+            takes = self.__game.check_for_takes()
+            print(takes)
+            if takes != []:
+                self.__console.insert(END,"There are take[s] available", str(takes), "\n")
 
     def __remove_poss(self):
         self.__game.remove_possible_moves()
@@ -109,6 +120,7 @@ class GUI(UI):
         #print(possible)
         #if possible != []:
            # self.__console.insert(END, "There is a take available, which you must do\n")
+        
         try:
             moves, takes = self.__game._get_legal_moves(row+1, col+1, False)
         except GameError:
@@ -154,10 +166,17 @@ class GUI(UI):
         if take != 0:
             self.__console.insert(END,"Another take is available\n")
 
-        w = self.__game.finished()
-        if w is not None:
+        
+        if self.__game._finished_game is not None:
             self.__finished = True
-            self.__console.insert(END, f"The winner was {w}\n")
+            self.__console.insert(END, f"The winner was {self.__game._finished_game}\n")
+            self.__winner = self.__game._finished_game
+            finished_game = Toplevel()
+            finished_game.title("Game Finished")
+            frame = Frame(finished_game)
+            finished_text = f"Winner was: {self.__winner}"
+            Message(finished_game,text=finished_text).pack(fill=X)
+            Button(finished_game, text="Dismiss",command=finished_game.destroy).pack(fill=X)
 
 
     def run(self):
@@ -170,7 +189,7 @@ class Terminal(UI):
 
 
     def run(self):
-        while not self._game.finished:
+        while not self._game._finished_game:
             print(self._game)
             print(self._game.whos_move())
             try:
