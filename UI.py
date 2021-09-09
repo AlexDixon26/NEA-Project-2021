@@ -36,7 +36,7 @@ class GUI(UI):
             command = self._quit_callback).pack(fill=X)
 
 
-        console = Text(frame,height=4,width=50)
+        console = Text(frame,height=15,width=50)
         scroll = Scrollbar(frame)
         scroll.pack(side=LEFT,fill=Y)
         console.pack(side=LEFT,fill=Y)
@@ -53,6 +53,7 @@ class GUI(UI):
         self.__root.quit()
 
     def _play_callback(self):
+        self._takes = []
         self.__console.delete("1.0", END)
         self.__game = Game(Game.Human,Game.Human) #Game.Ai/Human/Client,Game.Ai/Human/Client in brackets CHANGE THIS LATER TO BE WHICHEVER IS DECIDED UPON
         self.__finished = False
@@ -76,10 +77,10 @@ class GUI(UI):
         self._turn = StringVar()
         self._turn.set(f"Turn: {self.__game._player}")
         turnlabel = Label(frame, textvariable=self._turn).grid(row=9,column=1,columnspan=2,sticky=N+S+W+E)
-        takes = self.__game.check_for_takes()
-        print(takes)
-        if takes != []:
-            self.__console.insert(END,"There are take[s] available", str(takes), "\n")
+        #IF CUSTOM MAPS(UNLIKELY) THIS WILL BE NEEDED
+        #takes = self.__game.check_for_takes()
+        #if takes != []:
+        #    self.__console.insert(END,"There are take[s] available", str(takes), "\n")
 
 
 
@@ -99,9 +100,9 @@ class GUI(UI):
             self.__make_move(self._row_of_curr, self._col_of_curr, row, col)
             self._turn.set(f"Turn: {self.__game._player}")
             takes = self.__game.check_for_takes()
-            print(takes)
             if takes != []:
                 self.__console.insert(END,"There are take[s] available", str(takes), "\n")
+            self._takes = takes
 
     def __remove_poss(self):
         self.__game.remove_possible_moves()
@@ -114,13 +115,23 @@ class GUI(UI):
     def __check_poss_moves(self, row, col):
         self.possiblerow = []
         self.possiblecol = []
+        movelist = []
+        succeed = False
         if self.__finished:
             return
-        #possible = self.__game.take_available()
-        #print(possible)
-        #if possible != []:
-           # self.__console.insert(END, "There is a take available, which you must do\n")
-        
+        for move in self._takes:
+            strmove = ""
+            for num in move:
+                strmove += str(num)
+            movelist.append(strmove)
+        for item in movelist:
+            if row == int(item[0])-1 and col == int(strmove[1])-1:
+                succeed = True
+        if succeed == False and self._takes != []:
+            self._eventno = 1
+            self.__console.insert(END, "This peice cannot move, because there are takes available elsewhere\n")
+            return
+
         try:
             moves, takes = self.__game._get_legal_moves(row+1, col+1, False)
         except GameError:
