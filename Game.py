@@ -40,7 +40,7 @@ class Game:
         self._player = Game.P1
         
     def _do_move(self, row, col, row_to_move, col_to_move, take_used):
-        #Validation of piece being theres
+        #Validation of piece being there
         takes = 0
         if self._player == Game.P1:
             possible = [Game.P1King,Game.P1Man]
@@ -241,9 +241,6 @@ class Game:
             if item[1] not in [0,1,2,3,4,5,6,7]:
                 result.remove(item)
 
-        if just_checking == True:
-            print(take)
-
         return result, take
 
     def print_possible_moves(self, row, col):
@@ -280,7 +277,7 @@ class Game:
                     _, takes = self._get_legal_moves(row+1,col+1,True)
                     print("takes counted: ", takes)
                 if takes != 0:
-                    result.append([row+1,col+1])
+                    result.append([row+0,col+1])
         return result
 
     @property
