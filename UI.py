@@ -1,6 +1,6 @@
 from Game import Game, GameError
 from abc import ABC, abstractmethod
-from tkinter import END, Button, Tk, Toplevel, Frame, X, StringVar, Text,Scrollbar, LEFT, RIGHT, Y, Grid, N, S, W, E, Message, Label
+from tkinter import END, Button, Tk, Toplevel, Frame, X, StringVar, Text,Scrollbar, LEFT, RIGHT, Y, Grid, N, S, W, E, Message, Label, Image, PhotoImage
 from itertools import product
 
 class UI(ABC):
@@ -38,7 +38,7 @@ class GUI(UI):
 
         console = Text(frame,height=15,width=50)
         scroll = Scrollbar(frame)
-        scroll.pack(side=LEFT,fill=Y)
+        scroll.pack(side=RIGHT,fill=Y)
         console.pack(side=LEFT,fill=Y)
         
         scroll.config(command=console.yview)
@@ -189,6 +189,8 @@ class GUI(UI):
     def _update_board(self):
         for row, col in product(range(8),range(8)):
             text = self.__game.at(row+1,col+1)
+            #if text == "⚪ ":
+            #    text = PhotoImage(file="white counter.png")
             self.__buttons[row][col].set(text)
     
     
