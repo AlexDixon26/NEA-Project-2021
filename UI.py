@@ -46,13 +46,50 @@ class GUI(UI):
         self.__console = console
         self.__root = root
 
-    def _help_callback(self):
+    def _play_callback(self):
+        play_menu = Toplevel(self.__root)
+        play_menu.title("Play Menu")
+        frame = Frame(play_menu)
+        frame.pack()
+
+        Button(
+            frame,
+            text='Play Online (Player vs Player)',
+            command= self._play_online).pack(fill=X)
+        
+        Button(
+            frame,
+            text='Play Offline (Player vs Player)',
+            command= self._play_offline).pack(fill=X)
+        
+        Button(
+            frame,
+            text='Play Offline (Player vs Computer)',
+            command = self._play_computer).pack(fill=X)
+        
+        self._play_menu = play_menu
+
+    def _play_computer(self):
         pass
+
+    def _play_online(self):
+        pass
+
+    def _help_callback(self):
+        help_instructions = Toplevel(self.__root)
+        help_instructions.title("Rules")
+        frame = Frame(help_instructions)
+        frame.pack()
+
+        rules = StringVar()
+        rules.set(f"If you click on a peice and then change your mind, click on the same peice again to deselect it!")
+        rulesLabel = Label(frame, textvariable=rules).pack()
 
     def _quit_callback(self):
         self.__root.quit()
 
-    def _play_callback(self):
+    def _play_offline(self):
+        self._play_menu.destroy()
         self._takes = []
         self.__console.delete("1.0", END)
         self.__game = Game(Game.Human,Game.Human) #Game.Ai/Human/Client,Game.Ai/Human/Client in brackets CHANGE THIS LATER TO BE WHICHEVER IS DECIDED UPON
@@ -106,10 +143,7 @@ class GUI(UI):
 
     def __remove_poss(self):
         self.__game.remove_possible_moves()
-
-        for row, col in product(range(8),range(8)):
-            text = self.__game.at(row+1,col+1)
-            self.__buttons[row][col].set(text)
+        self._update_board()
         self._eventno = 1
 
     def __check_poss_moves(self, row, col):
@@ -125,8 +159,9 @@ class GUI(UI):
                 strmove += str(num)
             movelist.append(strmove)
         for item in movelist:
-            if row == int(item[0])-1 and col == int(strmove[1])-1:
+            if row == int(item[0])-1 and col == int(item[1])-1:
                 succeed = True
+            
         if succeed == False and self._takes != []:
             self._eventno = 1
             self.__console.insert(END, "This peice cannot move, because there are takes available elsewhere\n")
@@ -149,12 +184,13 @@ class GUI(UI):
         #except:
             #pass
 
+        self._update_board()
+
+    def _update_board(self):
         for row, col in product(range(8),range(8)):
             text = self.__game.at(row+1,col+1)
             self.__buttons[row][col].set(text)
-
-
-        
+    
     
     def __make_move(self, row, col, row_to_move, col_to_move):
         if row_to_move not in self.possiblerow:
@@ -171,9 +207,7 @@ class GUI(UI):
         else:   
             take_used = False
         take = self.__game._do_move(row+1, col+1, row_to_move+1, col_to_move +1, take_used)
-        for row, col in product(range(8),range(8)):
-            text = self.__game.at(row+1,col+1)
-            self.__buttons[row][col].set(text)
+        self._update_board()
         if take != 0:
             self.__console.insert(END,"Another take is available\n")
 
