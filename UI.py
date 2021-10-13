@@ -110,22 +110,7 @@ class GUI(UI):
         self._eventno = 1 
         self.__game_win = game_window                          
         for row,col in product(range(8),range(8)):
-            #b = StringVar()
-            #b.set(self.__game.at(row+1,col+1))
-            b = self.__game.at(row+1,col+1)
-            if b == "⚫ ":
-                img = self._BLACKCOUNTER
-            elif b == "⚪ ":
-                img = self._WHITECOUNTER
-            elif b == " ♔ ":
-                img = self._BLACKKING
-            elif b == " ♚ ":
-                img = self._WHITEKING
-            elif b == "🟢":
-                img = self._POSSIBLEMOVE
-            else:
-                img = self._BLANKSQUARE
-            
+            img = self._text_to_image(row, col)
             cmd = lambda r=row, c=col: self.__event_handler(self._eventno, r,c)
         
             button = Button(frame,image=img,command=cmd)
@@ -207,22 +192,25 @@ class GUI(UI):
 
         self._update_board()
 
+    def _text_to_image(self, row, col):
+        b = self.__game.at(row+1,col+1)
+        if b == "⚫ ":
+            img = self._BLACKCOUNTER
+        elif b == "⚪ ":
+            img = self._WHITECOUNTER
+        elif b == " ♔ ":
+            img = self._BLACKKING
+        elif b == " ♚ ":
+            img = self._WHITEKING
+        elif b == "🟢":
+            img = self._POSSIBLEMOVE
+        else:
+            img = self._BLANKSQUARE
+        return img
+
     def _update_board(self):
         for row, col in product(range(8),range(8)):
-            b = self.__game.at(row+1,col+1)
-            if b == "⚫ ":
-                img = self._BLACKCOUNTER
-            elif b == "⚪ ":
-                img = self._WHITECOUNTER
-            elif b == " ♔ ":
-                img = self._BLACKKING
-            elif b == " ♚ ":
-                img = self._WHITEKING
-            elif b == "🟢":
-                img = self._POSSIBLEMOVE
-            else:
-                img = self._BLANKSQUARE
-            
+            img = self._text_to_image(row, col)
             self.__buttons[row][col].config(image=img)
 
     
