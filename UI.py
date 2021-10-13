@@ -1,6 +1,7 @@
 from Game import Game, GameError
 from abc import ABC, abstractmethod
-from tkinter import END, Button, Tk, Toplevel, Frame, X, StringVar, Text,Scrollbar, LEFT, RIGHT, Y, Grid, N, S, W, E, Message, Label, Image, PhotoImage
+from tkinter import *
+# END, Button, Tk, Toplevel, Frame, X, StringVar, Text,Scrollbar, LEFT, RIGHT, Y, Grid, N, S, W, E, Message, Label, Image, PhotoImage
 from itertools import product
 
 class UI(ABC):
@@ -15,6 +16,12 @@ class GUI(UI):
         root.title("Draughts")
         frame = Frame(root)
         frame.pack()
+        self._WHITECOUNTER = PhotoImage(file="white counter.png")
+        self._BLACKCOUNTER = PhotoImage(file="black counter.png")
+        self._BLANKSQUARE = PhotoImage(file="blank square.png")
+        self._WHITEKING = PhotoImage(file="white king.png")
+        self._BLACKKING = PhotoImage(file="black king.png")
+        self._POSSIBLEMOVE = PhotoImage(file="possible move.png")
         try:
             self._eventno = self._eventno
         except AttributeError:
@@ -103,13 +110,27 @@ class GUI(UI):
         self._eventno = 1 
         self.__game_win = game_window                          
         for row,col in product(range(8),range(8)):
-            b = StringVar()
-            b.set(self.__game.at(row+1,col+1))
+            #b = StringVar()
+            #b.set(self.__game.at(row+1,col+1))
+            b = self.__game.at(row+1,col+1)
+            if b == "⚫ ":
+                img = self._BLACKCOUNTER
+            elif b == "⚪ ":
+                img = self._WHITECOUNTER
+            elif b == " ♔ ":
+                img = self._BLACKKING
+            elif b == " ♚ ":
+                img = self._WHITEKING
+            elif b == "🟢":
+                img = self._POSSIBLEMOVE
+            else:
+                img = self._BLANKSQUARE
             
             cmd = lambda r=row, c=col: self.__event_handler(self._eventno, r,c)
-            
-            Button(frame,textvariable=b,command=cmd).grid(row=row,column=col,sticky=N+S+W+E)
-            self.__buttons[row][col] = b
+        
+            button = Button(frame,image=img,command=cmd)
+            button.grid(row=row,column=col,sticky=N+S+W+E)
+            self.__buttons[row][col] = button
         
         self._turn = StringVar()
         self._turn.set(f"Turn: {self.__game._player}")
@@ -188,10 +209,22 @@ class GUI(UI):
 
     def _update_board(self):
         for row, col in product(range(8),range(8)):
-            text = self.__game.at(row+1,col+1)
-            #if text == "⚪ ":
-            #    text = PhotoImage(file="white counter.png")
-            self.__buttons[row][col].set(text)
+            b = self.__game.at(row+1,col+1)
+            if b == "⚫ ":
+                img = self._BLACKCOUNTER
+            elif b == "⚪ ":
+                img = self._WHITECOUNTER
+            elif b == " ♔ ":
+                img = self._BLACKKING
+            elif b == " ♚ ":
+                img = self._WHITEKING
+            elif b == "🟢":
+                img = self._POSSIBLEMOVE
+            else:
+                img = self._BLANKSQUARE
+            
+            self.__buttons[row][col].config(image=img)
+
     
     
     def __make_move(self, row, col, row_to_move, col_to_move):
