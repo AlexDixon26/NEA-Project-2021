@@ -80,6 +80,21 @@ class GUI(UI):
         pass
 
     def _play_online(self):
+        play_online_choose = Toplevel(self.__root)
+        play_online_choose.title("Join or Create Game")
+        frame = Frame(play_online_choose)
+        frame.pack()
+
+        Button(frame, text="Join Game", command = self._join_game).pack()
+        Button(frame, text="Create Game", command = self._create_game).pack()
+        #LAMBDA COMMAND TO RUN MULTIPLE COMMANDS FROM BUTTON PRESS
+        goback = lambda: [self._play_callback, play_online_choose.destroy()]
+        Button(frame, text="Go Back", command = goback).pack()
+
+    def _join_game(self):
+        pass
+
+    def _create_game(self):
         pass
 
     def _help_callback(self):
