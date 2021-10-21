@@ -257,8 +257,6 @@ class Game:
         return "Black to move" if self._player is Game.P1 else "White to move"
 
     def at(self, row, col):
-        row -= 1
-        col -= 1
         return self._board[row][col]
 
     def return_player(self):

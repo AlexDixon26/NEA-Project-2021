@@ -17,6 +17,8 @@ class GUI(UI):
         root.title("Draughts")
         frame = Frame(root)
         frame.pack()
+        self.__root = root
+        self.login()
         self._WHITECOUNTER = PhotoImage(file="white counter.png")
         self._BLACKCOUNTER = PhotoImage(file="black counter.png")
         self._BLANKSQUARE = PhotoImage(file="blank square.png")
@@ -52,9 +54,10 @@ class GUI(UI):
         scroll.config(command=console.yview)
         console.config(yscrollcommand=scroll.set)
         self.__console = console
-        self.__root = root
 
     def _play_callback(self):
+        if self.__started == False:
+            return
         play_menu = Toplevel(self.__root)
         play_menu.title("Play Menu")
         frame = Frame(play_menu)
@@ -99,6 +102,8 @@ class GUI(UI):
         pass
 
     def _help_callback(self):
+        if self.__started == False:
+            return
         help_instructions = Toplevel(self.__root)
         help_instructions.title("Rules")
         frame = Frame(help_instructions)
@@ -128,9 +133,9 @@ class GUI(UI):
         self.__buttons = [[None]*8 for _ in range(8)]  
         self._eventno = 1 
         self.__game_win = game_window                          
-        for row,col in product(range(8),range(8)):
+        for row, col in product(range(0,8), range(0,8)):
             img = self._text_to_image(row, col)
-            cmd = lambda r=row, c=col: self.__event_handler(self._eventno, r,c)
+            cmd = lambda r=row, c=col: self.__event_handler(self._eventno, r, c)
         
             button = Button(frame,image=img,command=cmd)
             button.grid(row=row,column=col,sticky=N+S+W+E)
@@ -212,7 +217,7 @@ class GUI(UI):
         self._update_board()
 
     def _text_to_image(self, row, col):
-        b = self.__game.at(row+1,col+1)
+        b = self.__game.at(row,col)
         if b == "⚫ ":
             img = self._BLACKCOUNTER
         elif b == "⚪ ":
@@ -223,8 +228,10 @@ class GUI(UI):
             img = self._WHITEKING
         elif b == "🟢":
             img = self._POSSIBLEMOVE
-        else:
+        elif b == "   ":
             img = self._BLANKSQUARE
+        else:
+            GameError()
         return img
 
     def _update_board(self):
@@ -270,7 +277,7 @@ class GUI(UI):
         self.__root.mainloop()
 
     def login(self):
-        login = Tk()
+        login = Toplevel(self.__root)
         login.title("Login/Signup")
         frame = Frame(login)
         frame.pack()
@@ -307,7 +314,7 @@ class GUI(UI):
         warning.set(f"Are you sure you want to continue as a Guest? You can't save games as a Guest!")
         rulesLabel = Label(frame, textvariable=warning).pack()
         
-        button_lambda = lambda: [cont_guest.destroy(),self.__login.destroy(),self.__root.mainloop()]
+        button_lambda = lambda: [cont_guest.destroy(),self.__login.destroy()]
         Button(
             frame,
             text='Continue as guest',
