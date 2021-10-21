@@ -11,6 +11,8 @@ class UI(ABC):
 
 class GUI(UI):
     def __init__(self):
+        self.__started = False
+        self.login()
         self.__finished = False
         root = Tk()
         root.title("Draughts")
@@ -108,7 +110,10 @@ class GUI(UI):
         rulesLabel = Label(frame, textvariable=rules).pack()
 
     def _quit_callback(self):
-        self.__root.quit()
+        if self.__started:
+            self.__root.quit()
+        else:
+            return
 
     def _play_offline(self):
         self._play_menu.destroy()
@@ -264,6 +269,52 @@ class GUI(UI):
 
     def run(self):
         self.__root.mainloop()
+
+    def login(self):
+        login = Tk()
+        login.title("Login/Signup")
+        frame = Frame(login)
+        frame.pack()
+        Button(
+            frame,
+            text='Login',
+            command= self._login).pack(fill=X)
+        
+        Button(
+            frame,
+            text='Sign up',
+            command= self._signup).pack(fill=X)
+        
+        Button(
+            frame,
+            text='Continue as guest',
+            command = self._continue_as_guest).pack(fill=X)
+
+        self.__login = login
+    
+    def _login(self):
+        pass
+
+    def _signup(self):
+        pass
+
+    def _continue_as_guest(self):
+        cont_guest = Toplevel(self.__login)
+        cont_guest.title("Warning - Continuing as Guest")
+        frame = Frame(cont_guest)
+        frame.pack()
+
+        warning = StringVar()
+        warning.set(f"Are you sure you want to continue as a Guest? You can't save games as a Guest!")
+        rulesLabel = Label(frame, textvariable=warning).pack()
+        
+        button_lambda = lambda: [cont_guest.destroy(),self.__login.destroy(),self.__root.mainloop()]
+        Button(
+            frame,
+            text='Continue as guest',
+            command = button_lambda).pack(fill=X)
+
+        self.__started = True
 
 
 class Terminal(UI):
