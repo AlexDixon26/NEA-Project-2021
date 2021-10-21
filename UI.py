@@ -12,7 +12,6 @@ class UI(ABC):
 class GUI(UI):
     def __init__(self):
         self.__started = False
-        self.login()
         self.__finished = False
         root = Tk()
         root.title("Draughts")
