@@ -279,6 +279,7 @@ class GUI(UI):
     def login(self):
         login = Toplevel(self.__root)
         login.title("Login/Signup")
+        login.geometry("300x250")
         frame = Frame(login)
         frame.pack()
         Button(
@@ -301,8 +302,46 @@ class GUI(UI):
     def _login(self):
         pass
 
+    def register_user(self):
+        user_info = username.get()
+        pass_info = password.get()
+        file = open("C:/Users/alexa/Documents/NEA-Project-2021/userfiles/"+user_info+".txt", "w")
+        var = user_info, ":", pass_info
+        file.write(str(var))
+        file.close()
+        self.__signup.destroy()
+        success = Toplevel(self.__login)
+        success.title("Sign Up Success")
+        success.geometry("200x200")
+        Label(success, text="Registration Success", fg = "green", font = ("Calibri")).pack()
+        Button(success, command=self.__login.destroy, textvariable = "continue", width = 10, height = 1).pack()
+        self.__started = True
+
     def _signup(self):
-        pass
+        signup = Toplevel(self.__login)
+        signup.title("Sign Up")
+        signup.geometry("300x250")
+
+        global username
+        global password
+        global username_entry
+        global password_entry
+        username = StringVar()
+        password = StringVar()
+
+        Label(signup, text="Please enter sign up details below").pack()
+        Label(signup, text="").pack()
+        Label(signup, text="Username:").pack()
+        username_entry = Entry(signup, textvariable = username)
+        username_entry.pack()
+        Label(signup, text="Password:").pack()
+        password_entry = Entry(signup, textvariable = password)
+        password_entry.pack()
+        Label(signup, text="").pack()
+        Button(signup, text = "Sign Up", width = 10, height = 1, command = self.register_user).pack()
+
+        self.__signup = signup
+
 
     def _continue_as_guest(self):
         cont_guest = Toplevel(self.__login)
