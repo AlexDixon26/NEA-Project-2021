@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 from tkinter import *
 # END, Button, Tk, Toplevel, Frame, X, StringVar, Text,Scrollbar, LEFT, RIGHT, Y, Grid, N, S, W, E, Message, Label, Image, PhotoImage
 from itertools import product
+from Human import Human
 
 class UI(ABC):
     @abstractmethod
@@ -306,15 +307,15 @@ class GUI(UI):
         user_info = username.get()
         pass_info = password.get()
         file = open("C:/Users/alexa/Documents/NEA-Project-2021/userfiles/"+user_info+".txt", "w")
-        var = user_info, ":", pass_info
-        file.write(str(var))
+        file.write(user_info, pass_info)
         file.close()
+        self._user = Human(user_info)
         self.__signup.destroy()
         success = Toplevel(self.__login)
         success.title("Sign Up Success")
         success.geometry("200x200")
         Label(success, text="Registration Success", fg = "green", font = ("Calibri")).pack()
-        Button(success, command=self.__login.destroy, textvariable = "continue", width = 10, height = 1).pack()
+        Button(success, command=self.__login.destroy, text = "continue", width = 10, height = 1).pack()
         self.__started = True
 
     def _signup(self):
