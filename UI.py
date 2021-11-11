@@ -301,13 +301,41 @@ class GUI(UI):
         self.__login = login
     
     def _login(self):
-        pass
+        login = Toplevel(self.__login)
+        login.title("Login")
+        login.geometry("300x250")
+
+        #global username
+        #global password
+        #global username_entry
+        #global password_entry
+        username = StringVar()
+        password = StringVar()
+
+        Label(login, text="Please enter login details below").pack()
+        Label(login, text="").pack()
+        Label(login, text="Username:").pack()
+        username_entry = Entry(login, textvariable = username)
+        username_entry.pack()
+        Label(login, text="Password:").pack()
+        password_entry = Entry(login, textvariable = password, show = "*")
+        password_entry.pack()
+        Label(login, text="").pack()
+        Button(login, text = "Login", width = 10, height = 1, command = self.register_user).pack()
 
     def register_user(self):
+        if self.__password_check != password.get():
+            failure = Toplevel(self.__login)
+            failure.title("Sign Up Failure")
+            failure.geometry("300x300")
+            Label(failure, text="Passwords do not match", fg = "red", font = ("Calibri")).pack()
+            command = lambda: [failure.destroy(), self.__password_check == ""]
+            Button(failure, command=command, text = "continue", width = 10, height = 1).pack()
+            pass
         user_info = username.get()
         pass_info = password.get()
         file = open("C:/Users/alexa/Documents/NEA-Project-2021/userfiles/"+user_info+".txt", "w")
-        file.write(user_info, pass_info)
+        file.write(str(user_info, pass_info))
         file.close()
         self._user = Human(user_info)
         self.__signup.destroy()
@@ -329,7 +357,7 @@ class GUI(UI):
         global password_entry
         username = StringVar()
         password = StringVar()
-
+        self.__password_check = ""
         Label(signup, text="Please enter sign up details below").pack()
         Label(signup, text="").pack()
         Label(signup, text="Username:").pack()
@@ -338,8 +366,11 @@ class GUI(UI):
         Label(signup, text="Password:").pack()
         password_entry = Entry(signup, textvariable = password)
         password_entry.pack()
+        password_check = Entry(signup, textvariable = self.__password_check)
+        password_check.pack()
         Label(signup, text="").pack()
         Button(signup, text = "Sign Up", width = 10, height = 1, command = self.register_user).pack()
+            
 
         self.__signup = signup
 
