@@ -300,7 +300,7 @@ class GUI(UI):
 
         self.__login = login
     
-    def _login(self):
+    def _login(self)    :
         login = Toplevel(self.__login)
         login.title("Login")
         login.geometry("300x250")
@@ -331,12 +331,12 @@ class GUI(UI):
             Label(failure, text="Passwords do not match", fg = "red", font = ("Calibri")).pack()
             command = lambda: [failure.destroy(), self.__password_check == ""]
             Button(failure, command=command, text = "continue", width = 10, height = 1).pack()
-            pass
+            
         user_info = username.get()
         pass_info = password.get()
-        file = open("C:/Users/alexa/Documents/NEA-Project-2021/userfiles/"+user_info+".txt", "w")
-        file.write(str(user_info, pass_info))
-        file.close()
+        file = open("C:/Users/alexa/Documents/NEA-Project-2021/userfiles/"+user_info, "w")
+        file.write(str(user_info, pass_info))       
+        file.close()    
         self._user = Human(user_info)
         self.__signup.destroy()
         success = Toplevel(self.__login)
