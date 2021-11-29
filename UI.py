@@ -156,6 +156,7 @@ class GUI(UI):
         if self.__finished:
             return
         if eventno == 1:
+            self._takes = []
             self._row_of_curr = row
             self._col_of_curr = col
             self._eventno = 2
@@ -286,7 +287,7 @@ class GUI(UI):
         Button(
             frame,
             text='Login',
-            command= self._login).pack(fill=X)
+            command= self._loginmenu).pack(fill=X)
         
         Button(
             frame,
@@ -300,7 +301,7 @@ class GUI(UI):
 
         self.__login = login
     
-    def _login(self)    :
+    def _loginmenu(self)    :
         login = Toplevel(self.__login)
         login.title("Login")
         login.geometry("300x250")
