@@ -4,6 +4,8 @@ from tkinter import *
 # END, Button, Tk, Toplevel, Frame, X, StringVar, Text,Scrollbar, LEFT, RIGHT, Y, Grid, N, S, W, E, Message, Label, Image, PhotoImage
 from itertools import product
 from Human import Human
+from AI import AI
+from random import randint as r
 
 class UI(ABC):
     @abstractmethod
@@ -82,7 +84,35 @@ class GUI(UI):
         self._play_menu = play_menu
 
     def _play_computer(self):
-        pass
+        play_computer = Toplevel(self.__root)
+        play_computer.title("Choose Computer Difficulty")
+        frame = Frame(play_computer)
+        frame.pack()
+
+        warning = StringVar()
+        warning.set(f"Choose a Computer Difficulty")
+        rulesLabel = Label(frame, textvariable=warning).pack()
+        
+        Button(
+            frame,
+            text='Easy',
+            command = self.computer_versus("Easy")).pack(fill=X)
+        
+        Button(
+            frame,
+            text='Hard',
+            command = self.computer_versus("Hard")).pack(fill=X)
+        
+        Button(
+            frame,
+            text='Extreme',
+            command = self.computer_versus("Extreme")).pack(fill=X)
+
+    def computer_versus(self,difficulty):
+        piece = r(1,2)
+        piece = "Black" if piece == 1 else "White"
+        #Create New Computer Opponent
+        Computer = AI(difficulty,piece)
 
     def _play_online(self):
         play_online_choose = Toplevel(self.__root)
@@ -322,7 +352,11 @@ class GUI(UI):
         password_entry = Entry(login, textvariable = password, show = "*")
         password_entry.pack()
         Label(login, text="").pack()
-        Button(login, text = "Login", width = 10, height = 1, command = self.register_user).pack()
+        Button(login, text = "Login", width = 10, height = 1, command = self.login_user).pack()
+
+    def login_user(self):
+        
+        pass
 
     def register_user(self):
         if self.__password_check != password.get():
@@ -470,7 +504,7 @@ class Terminal(UI):
                             row_to_move = int(input("Enter row to move to:"))
                             col_to_move = int(input("Enter col to move to:"))
                             if row_to_move not in potential_rows:
-                                print("You cannot move there!")
+                                print("You cannot move there!") 
                                 raise ValueError
                             if col_to_move not in potential_columns:
                                 print("You cannot move there!")
