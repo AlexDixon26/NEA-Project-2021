@@ -14,6 +14,7 @@ class UI(ABC):
 
 class GUI(UI):
     def __init__(self):
+        self.__comp_turn = False
         self.__started = False
         self.__finished = False
         root = Tk()
@@ -84,6 +85,7 @@ class GUI(UI):
         self._play_menu = play_menu
 
     def _play_computer(self):
+        difficulty = ""
         play_computer = Toplevel(self.__root)
         play_computer.title("Choose Computer Difficulty")
         frame = Frame(play_computer)
@@ -92,27 +94,39 @@ class GUI(UI):
         warning = StringVar()
         warning.set(f"Choose a Computer Difficulty")
         rulesLabel = Label(frame, textvariable=warning).pack()
+    
+        easy = lambda: [self.computer_versus("Easy")]
+        hard = lambda: [self.computer_versus("Hard")]
+        extreme = lambda: [self.computer_versus("Extreme")]
         
         Button(
             frame,
             text='Easy',
-            command = self.computer_versus("Easy")).pack(fill=X)
+            command = easy).pack(fill=X)
         
         Button(
             frame,
             text='Hard',
-            command = self.computer_versus("Hard")).pack(fill=X)
+            command = hard).pack(fill=X)
         
         Button(
             frame,
             text='Extreme',
-            command = self.computer_versus("Extreme")).pack(fill=X)
+            command = extreme).pack(fill=X)
 
     def computer_versus(self,difficulty):
         piece = r(1,2)
         piece = "Black" if piece == 1 else "White"
         #Create New Computer Opponent
         Computer = AI(difficulty,piece)
+        self._play_computer.destroy()
+        self._takes = []
+        self.__console.delete("1.0", END)
+        self.__game = Game(Game.Human,Game.AI) #Game.Ai/Human/Client,Game.Ai/Human/Client in brackets CHANGE THIS LATER TO BE WHICHEVER IS DECIDED UPON
+        self.__finished = False
+        self._print_board()
+        self._computer_piece = "White" if piece == "Black" else "Black"
+        self.__comp_turn = True
 
     def _play_online(self):
         play_online_choose = Toplevel(self.__root)
@@ -156,6 +170,9 @@ class GUI(UI):
         self.__console.delete("1.0", END)
         self.__game = Game(Game.Human,Game.Human) #Game.Ai/Human/Client,Game.Ai/Human/Client in brackets CHANGE THIS LATER TO BE WHICHEVER IS DECIDED UPON
         self.__finished = False
+        self._print_board()
+    
+    def _print_board(self):
         game_window = Toplevel(self.__root)
         game_window.title("Draughts Board")
         frame = Frame(game_window)
@@ -282,17 +299,23 @@ class GUI(UI):
             self._eventno = 2
             self.__console.insert(END, "Not able to move there\n")
             return
-            
         if row_to_move in [row-2,row+2]:
             take_used = True
         else:   
             take_used = False
         take = self.__game._do_move(row+1, col+1, row_to_move+1, col_to_move +1, take_used)
+
+
+        if take != 0:
+            if self.__game._player == Game.P1:
+                self.__game._player = Game.P2
+            else:
+                self.__game._player = Game.P1
+        
         self._update_board()
         if take != 0:
             self.__console.insert(END,"Another take is available\n")
 
-        
         if self.__game._finished_game is not None:
             self.__finished = True
             self.__console.insert(END, f"The winner was {self.__game._finished_game}\n")
