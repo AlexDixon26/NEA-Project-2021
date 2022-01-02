@@ -97,10 +97,6 @@ class Game:
         if takes != 0:
             return takes
         else:
-            if self._player == Game.P1:
-                self._player = Game.P2
-            else:
-                self._player = Game.P1
             return 0
                             
         
