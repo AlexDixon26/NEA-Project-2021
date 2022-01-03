@@ -14,7 +14,6 @@ class UI(ABC):
 
 class GUI(UI):
     def __init__(self):
-        self.__comp_turn = False
         self.__started = False
         self.__finished = False
         root = Tk()
@@ -69,11 +68,6 @@ class GUI(UI):
 
         Button(
             frame,
-            text='Play Online (Player vs Player)',
-            command= self._play_online).pack(fill=X)
-        
-        Button(
-            frame,
             text='Play Offline (Player vs Player)',
             command= self._play_offline).pack(fill=X)
         
@@ -86,9 +80,9 @@ class GUI(UI):
 
     def _play_computer(self):
         difficulty = ""
-        play_computer = Toplevel(self.__root)
-        play_computer.title("Choose Computer Difficulty")
-        frame = Frame(play_computer)
+        self.play_computer = Toplevel(self.__root)
+        self.play_computer.title("Choose Computer Difficulty")
+        frame = Frame(self.play_computer)
         frame.pack()
 
         warning = StringVar()
@@ -118,27 +112,16 @@ class GUI(UI):
         piece = r(1,2)
         piece = "Black" if piece == 1 else "White"
         #Create New Computer Opponent
-        Computer = AI(difficulty,piece)
-        self._play_computer.destroy()
+        self._Computer = AI(difficulty,piece)
+        self.play_computer.destroy()
         self._takes = []
         self.__console.delete("1.0", END)
-        self.__game = Game(Game.Human,Game.AI) #Game.Ai/Human/Client,Game.Ai/Human/Client in brackets CHANGE THIS LATER TO BE WHICHEVER IS DECIDED UPON
+        self.__playing_comp = True
+        self.__game = Game() #Game.Ai/Human/Client,Game.Ai/Human/Client in brackets CHANGE THIS LATER TO BE WHICHEVER IS DECIDED UPON
         self.__finished = False
         self._print_board()
         self._computer_piece = "White" if piece == "Black" else "Black"
-        self.__comp_turn = True
 
-    def _play_online(self):
-        play_online_choose = Toplevel(self.__root)
-        play_online_choose.title("Join or Create Game")
-        frame = Frame(play_online_choose)
-        frame.pack()
-
-        Button(frame, text="Join Game", command = self._join_game).pack()
-        Button(frame, text="Create Game", command = self._create_game).pack()
-        #LAMBDA COMMAND TO RUN MULTIPLE COMMANDS FROM BUTTON PRESS
-        goback = lambda: [self._play_callback, play_online_choose.destroy()]
-        Button(frame, text="Go Back", command = goback).pack()
 
     def _join_game(self):
         pass
@@ -168,7 +151,7 @@ class GUI(UI):
         self._play_menu.destroy()
         self._takes = []
         self.__console.delete("1.0", END)
-        self.__game = Game(Game.Human,Game.Human) #Game.Ai/Human/Client,Game.Ai/Human/Client in brackets CHANGE THIS LATER TO BE WHICHEVER IS DECIDED UPON
+        self.__game = Game() #Game.Ai/Human/Client,Game.Ai/Human/Client in brackets CHANGE THIS LATER TO BE WHICHEVER IS DECIDED UPON
         self.__finished = False
         self._print_board()
     
@@ -192,11 +175,16 @@ class GUI(UI):
         self._turn = StringVar()
         self._turn.set(f"Turn: {self.__game._player}")
         turnlabel = Label(frame, textvariable=self._turn).grid(row=9,column=1,columnspan=2,sticky=N+S+W+E)
+
+        if self.__playing_comp == True and self.__game._player == self._computer_piece:
+            self._Computer.play()
+
+        #USE THIS FOR THE COMPUTER PLAYER
+        
         #IF CUSTOM MAPS(UNLIKELY) THIS WILL BE NEEDED
         #takes = self.__game.check_for_takes()
         #if takes != []:
         #    self.__console.insert(END,"There are take[s] available", str(takes), "\n")
-
 
 
     def __event_handler(self, eventno, row, col):

@@ -23,19 +23,7 @@ class Game:
     _DIM = 8
     _EMPTY = "   "
         
-    def __init__(self, player1, player2):
-        if player1 == Game.AI:
-            self.__player1 = AI()
-        elif player1 == Game.Human:
-            self.__player1 = Human()
-        elif player1 == Game.Network:
-            self.__player1 = Client()
-        if player2 == Game.AI:
-            self.__player2 = AI()
-        elif player2 == Game.Human:
-            self.__player2 = Human()
-        elif player2 == Game.Network:
-            self.__player2 = Client()
+    def __init__(self):
         self._board = [[Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man],[Game.P2Man,Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man,Game._EMPTY],[Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man],[Game._EMPTY]*Game._DIM,[Game._EMPTY]*Game._DIM,[Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY],[Game._EMPTY,Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY,Game.P1Man],[Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY]]
         self._player = Game.P1
         
