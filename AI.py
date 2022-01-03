@@ -9,9 +9,14 @@ class AI(Player):
 
     def __init__(self, difficulty, piece):
         self._difficulty = difficulty
-        #self.__game = Game
         self.__piece = [AI.P1Man,AI.P1King] if piece == "Black" else [AI.P2Man,AI.P2King]
 
-    def get_possible_move(self):
-        # no ideas waht this is even trying to do: for self.__piece in self.__game:
-        pass
+    def play(self):
+        if self._difficulty == "Easy":
+            print("Easy")
+        elif self._difficulty == "Hard":
+            print("Hard")
+        else:
+            print("Extreme")
+        
+        #place function in each if
