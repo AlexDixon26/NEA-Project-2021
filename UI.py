@@ -117,10 +117,19 @@ class GUI(UI):
         self._takes = []
         self.__console.delete("1.0", END)
         self.__playing_comp = True
-        self.__game = Game() #Game.Ai/Human/Client,Game.Ai/Human/Client in brackets CHANGE THIS LATER TO BE WHICHEVER IS DECIDED UPON
+        self.__game = Game()
         self.__finished = False
-        self._print_board()
         self._computer_piece = "White" if piece == "Black" else "Black"
+        self._print_board()
+    
+    def __make_ai_move(self):
+        results = self.__game.check_all_legal_moves(self._computer_piece)
+        movex, movey = self._Computer.get_move(results)
+
+        if self.__game._player == Game.P1:
+            self.__game._player = Game.P2
+        else:
+            self.__game._player = Game.P1
 
 
     def _join_game(self):
@@ -177,7 +186,7 @@ class GUI(UI):
         turnlabel = Label(frame, textvariable=self._turn).grid(row=9,column=1,columnspan=2,sticky=N+S+W+E)
 
         if self.__playing_comp == True and self.__game._player == self._computer_piece:
-            self._Computer.play()
+            self.__make_ai_move()
 
         #USE THIS FOR THE COMPUTER PLAYER
         
@@ -188,6 +197,8 @@ class GUI(UI):
 
 
     def __event_handler(self, eventno, row, col):
+        if self.__playing_comp == True and self.__game._player == self._computer_piece:
+            return
         if self.__finished:
             return
         if eventno == 1:

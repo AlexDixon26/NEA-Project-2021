@@ -235,7 +235,21 @@ class Game:
             for col in range(8):
                 if self._board[row][col] == Game.POSSIBLEMOVE:
                     self._board[row][col] = Game._EMPTY
-
+                
+    def check_all_legal_moves(self, piece):
+        result = []
+        if piece == "Black":
+            for col in range(Game._DIM):
+                for row in range(Game._DIM):
+                    if self._board[col][row] in [Game.P1Man,Game.P1King]:
+                        temp = self._get_legal_moves(col, row, True)
+                        result.append(temp)
+        else:
+            for col in range(Game._DIM):
+                for row in range(Game._DIM):
+                    if self._board[col][row] in [Game.P2Man,Game.P2King]:
+                        temp = self._get_legal_moves(col, row, True)
+                        result.append(temp)
 
     def whos_move(self):
         return "Black to move" if self._player is Game.P1 else "White to move"
@@ -252,11 +266,11 @@ class Game:
             PossiblePieces = [Game.P1King,Game.P1Man]
         else:
             PossiblePieces = [Game.P2King,Game.P2Man]
-        for row in range(Game._DIM):
-            for col in range(Game._DIM):
+        for col in range(Game._DIM):
+            for row in range(Game._DIM):
                 takes = 0
-                if self._board[row][col] in PossiblePieces:
-                    _, takes = self._get_legal_moves(row+1,col+1,True)
+                if self._board[col][row] in PossiblePieces:
+                    _, takes = self._get_legal_moves(col+1,row+1,True)
                 if takes != 0:
                     result.append([row+1,col+1])
         return result
