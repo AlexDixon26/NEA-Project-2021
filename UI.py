@@ -14,6 +14,7 @@ class UI(ABC):
 
 class GUI(UI):
     def __init__(self):
+        self.__playing_comp = False
         self.__started = False
         self.__finished = False
         root = Tk()
@@ -110,7 +111,8 @@ class GUI(UI):
 
     def computer_versus(self,difficulty):
         piece = r(1,2)
-        piece = "Black" if piece == 1 else "White"
+        #piece = "Black" if piece == 1 else "White"
+        piece = "White"
         #Create New Computer Opponent
         self._Computer = AI(difficulty,piece)
         self.play_computer.destroy()
@@ -124,12 +126,13 @@ class GUI(UI):
     
     def __make_ai_move(self):
         results = self.__game.check_all_legal_moves(self._computer_piece)
-        movex, movey = self._Computer.get_move(results)
+        move = self._Computer.get_move(results)
 
         if self.__game._player == Game.P1:
             self.__game._player = Game.P2
         else:
             self.__game._player = Game.P1
+        self._turn.set(f"Turn: {self.__game._player}")
 
 
     def _join_game(self):
@@ -185,8 +188,11 @@ class GUI(UI):
         self._turn.set(f"Turn: {self.__game._player}")
         turnlabel = Label(frame, textvariable=self._turn).grid(row=9,column=1,columnspan=2,sticky=N+S+W+E)
 
-        if self.__playing_comp == True and self.__game._player == self._computer_piece:
-            self.__make_ai_move()
+        try:
+            if self.__playing_comp == True and self.__game._player == self._computer_piece:
+                self.__make_ai_move()
+        except:
+            self._BLANKSQUARE = self._BLANKSQUARE
 
         #USE THIS FOR THE COMPUTER PLAYER
         
@@ -197,8 +203,6 @@ class GUI(UI):
 
 
     def __event_handler(self, eventno, row, col):
-        if self.__playing_comp == True and self.__game._player == self._computer_piece:
-            return
         if self.__finished:
             return
         if eventno == 1:
@@ -259,9 +263,6 @@ class GUI(UI):
                 self.__game.print_possible_moves(move[0]+1,move[1]+1)
             self.possiblerow.append(move[0])
             self.possiblecol.append(move[1])
-        #except:
-            #pass
-
         self._update_board()
 
     def _text_to_image(self, row, col):
@@ -304,8 +305,8 @@ class GUI(UI):
             take_used = False
         take = self.__game._do_move(row+1, col+1, row_to_move+1, col_to_move +1, take_used)
 
-
-        if take != 0:
+        #DO THAT YOU FUCK thank you
+        if take == 0:
             if self.__game._player == Game.P1:
                 self.__game._player = Game.P2
             else:
@@ -377,7 +378,7 @@ class GUI(UI):
         Button(login, text = "Login", width = 10, height = 1, command = self.login_user).pack()
 
     def login_user(self):
-        
+        #DO THIS
         pass
 
     def register_user(self):
