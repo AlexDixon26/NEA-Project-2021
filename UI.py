@@ -125,7 +125,10 @@ class GUI(UI):
         self._print_board()
     
     def __make_ai_move(self):
-        results = self.__game.check_all_legal_moves(self._computer_piece)
+        if self.__game._player == Game.P1:
+            results = self.__game.find_black_player_available_moves()
+        elif self.__game._player == Game.P2:
+            results = self.__game.find_white_player_available_moves()
         move = self._Computer.get_move(results)
 
         if self.__game._player == Game.P1:

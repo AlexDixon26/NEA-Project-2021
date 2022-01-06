@@ -100,7 +100,6 @@ class Game:
                             if self._board[row][col] == Game.P2Man:
                                 self._board[row][col] = Game.P2King
 
-
     def _get_legal_moves(self, row_of_piece, col_of_piece, just_checking):
         if self._player == Game.P1:
             possible = [Game.P1King,Game.P1Man] 
@@ -227,6 +226,143 @@ class Game:
 
         return result, take
 
+    
+
+    def find_white_player_available_moves(self):
+        available_moves = []
+        available_jumps = []
+        for m in range(8):
+            for n in range(8):
+                if self._board[m][n][0] == "c":
+                    if self._check_white_player_moves(m, n, m + 1, n + 1):
+                        available_moves.append([m, n, m + 1, n + 1])
+                    if self._check_white_player_moves(m, n, m + 1, n - 1):
+                        available_moves.append([m, n, m + 1, n - 1])
+                    if self._check_white_player_jumps(m, n, m + 1, n - 1, m + 2, n - 2):
+                        available_jumps.append([m, n, m + 2, n - 2])
+                    if self._check_white_player_jumps(m, n, m + 1, n + 1, m + 2, n + 2):
+                        available_jumps.append([m, n, m + 2, n + 2])
+                elif self._board[m][n][0] == "C":
+                    if self._check_white_player_moves(m, n, m + 1, n + 1):
+                        available_moves.append([m, n, m + 1, n + 1])
+                    if self._check_white_player_moves(m, n, m + 1, n - 1):
+                        available_moves.append([m, n, m + 1, n - 1])
+                    if self._check_white_player_moves(m, n, m - 1, n - 1):
+                        available_moves.append([m, n, m - 1, n - 1])
+                    if self._check_white_player_moves(m, n, m - 1, n + 1):
+                        available_moves.append([m, n, m - 1, n + 1])
+                    if self._check_white_player_jumps(m, n, m + 1, n - 1, m + 2, n - 2):
+                        available_jumps.append([m, n, m + 2, n - 2])
+                    if self._check_white_player_jumps(m, n, m - 1, n - 1, m - 2, n - 2):
+                        available_jumps.append([m, n, m - 2, n - 2])
+                    if self._check_white_player_jumps(m, n, m - 1, n + 1, m - 2, n + 2):
+                        available_jumps.append([m, n, m - 2, n + 2])
+                    if self._check_white_player_jumps(m, n, m + 1, n + 1, m + 2, n + 2):
+                        available_jumps.append([m, n, m + 2, n + 2])
+
+    def find_black_player_available_moves(self):
+        available_moves = []
+        available_jumps = []
+        for m in range(8):
+            for n in range(8):
+                if self._board[m][n] == Game.P1Man:
+                    if self._check_black_player_moves(m, n, m - 1, n - 1):
+                        available_moves.append([m, n, m - 1, n - 1])
+                    if self._check_black_player_moves(m, n, m - 1, n + 1):
+                        available_moves.append([m, n, m - 1, n + 1])
+                    if self._check_black_player_jumps(m, n, m - 1, n - 1, m - 2, n - 2):
+                        available_jumps.append([m, n, m - 2, n - 2])
+                    if self._check_black_player_jumps(m, n, m - 1, n + 1, m - 2, n + 2):
+                        available_jumps.append([m, n, m - 2, n + 2])
+                elif self._board[m][n] == Game.P1King:
+                    if self._check_black_player_moves(m, n, m - 1, n - 1):
+                        available_moves.append([m, n, m - 1, n - 1])
+                    if self._check_black_player_moves(m, n, m - 1, n + 1):
+                        available_moves.append([m, n, m - 1, n + 1])
+                    if self._check_black_player_jumps(m, n, m - 1, n - 1, m - 2, n - 2):
+                        available_jumps.append([m, n, m - 2, n - 2])
+                    if self._check_black_player_jumps(m, n, m - 1, n + 1, m - 2, n + 2):
+                        available_jumps.append([m, n, m - 2, n + 2])
+                    if self._check_black_player_moves(m, n, m + 1, n - 1):
+                        available_moves.append([m, n, m + 1, n - 1])
+                    if self._check_black_player_jumps(m, n, m + 1, n - 1, m + 2, n - 2):
+                        available_jumps.append([m, n, m + 2, n - 2])
+                    if self._check_black_player_moves(m, n, m + 1, n + 1):
+                        available_moves.append([m, n, m + 1, n + 1])
+                    if self._check_black_player_jumps(m, n, m + 1, n + 1, m + 2, n + 2):
+                        available_jumps.append([m, n, m + 2, n + 2])
+        
+        if len(available_jumps) != 0:
+            return available_jumps
+        else:
+            return available_moves
+
+    def _check_black_player_moves(self, old_x, old_y, new_x, new_y):
+        possible = [Game.P1King,Game.P1Man] 
+        if new_x > 7 or new_x < 0:
+            return False
+        if new_y > 7 or new_y < 0:
+            return False
+        if self._board[old_x][old_y] == Game._EMPTY:
+            return False
+        if self._board[new_x][new_y] != Game._EMPTY:
+            return False
+        if self._board[new_x][new_y] not in possible:
+            return False
+        if self._board[new_x][new_y] == Game._EMPTY:
+            return True
+
+    def _check_white_player_moves(self, old_x, old_y, new_x, new_y):
+        possible = [Game.P2King,Game.P2Man] 
+        if new_x > 7 or new_x < 0:
+            return False
+        if new_y > 7 or new_y < 0:
+            return False
+        if self._board[old_x][old_y] == Game._EMPTY:
+            return False
+        if self._board[new_x][new_y] != Game._EMPTY:
+            return False
+        if self._board[new_x][new_y] not in possible:
+            return False
+        if self._board[new_x][new_y] == Game._EMPTY:
+            return True
+
+    def _check_black_player_jumps(self, old_x, old_y, via_x, via_y, new_x, new_y):
+        possible = [Game.P1King,Game.P1Man] 
+        if new_x > 7 or new_x < 0:
+            return False
+        if new_y > 7 or new_y < 0:
+            return False
+        if self._board[via_x][via_y] == Game._EMPTY:
+            return False
+        if self._board[via_x][via_y] in possible:
+            return False
+        if self._board[new_x][new_y] != Game._EMPTY:
+            return False
+        if self._board[old_x][old_y] == Game._EMPTY:
+            return False
+        if self._board[old_x][old_y] not in possible:
+            return False
+        return True
+
+    def _check_white_player_jumps(self, old_x, old_y, via_x, via_y, new_x, new_y):
+        possible = [Game.P2King,Game.P2Man] 
+        if new_x > 7 or new_x < 0:
+            return False
+        if new_y > 7 or new_y < 0:
+            return False
+        if self._board[via_x][via_y] == Game._EMPTY:
+            return False
+        if self._board[via_x][via_y] in possible:
+            return False
+        if self._board[new_x][new_y] != Game._EMPTY:
+            return False
+        if self._board[old_x][old_y] == Game._EMPTY:
+            return False
+        if self._board[old_x][old_y] not in possible:
+            return False
+        return True
+
     def print_possible_moves(self, row, col):
         self._board[row-1][col-1] = Game.POSSIBLEMOVE
 
@@ -235,21 +371,6 @@ class Game:
             for col in range(8):
                 if self._board[row][col] == Game.POSSIBLEMOVE:
                     self._board[row][col] = Game._EMPTY
-                
-    def check_all_legal_moves(self, piece):
-        result = []
-        if piece == "Black":
-            for col in range(Game._DIM):
-                for row in range(Game._DIM):
-                    if self._board[col][row] in [Game.P1Man,Game.P1King]:
-                        temp = self._get_legal_moves(col, row, True)
-                        result.append(temp)
-        else:
-            for col in range(Game._DIM):
-                for row in range(Game._DIM):
-                    if self._board[col][row] in [Game.P2Man,Game.P2King]:
-                        temp = self._get_legal_moves(col, row, True)
-                        result.append(temp)
 
     def whos_move(self):
         return "Black to move" if self._player is Game.P1 else "White to move"
