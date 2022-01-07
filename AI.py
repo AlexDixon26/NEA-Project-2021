@@ -22,7 +22,7 @@ class AI(Player):
             if takes == False:
                 return movelist[r]
             else:
-                pass
+                return movelist[r]
                 #
                 #       WRITE CODE TO CHECK IF THE PIECE CAN TAKE AGAIN (MAYBE NEW FUNCTION?)
                 #

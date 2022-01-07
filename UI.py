@@ -6,6 +6,7 @@ from itertools import product
 from Human import Human
 from AI import AI
 from random import randint as r
+import time
 
 class UI(ABC):
     @abstractmethod
@@ -136,14 +137,8 @@ class GUI(UI):
         new_x = move[2]
         new_y = move[3]
 
-        self.__make_move(old_x,old_y,new_x,new_y)       
-
-        if self.__game._player == Game.P1:
-            self.__game._player = Game.P2
-        else:
-            self.__game._player = Game.P1
+        self.__make_move(old_x,old_y,new_x,new_y)
         self._turn.set(f"Turn: {self.__game._player}")
-
 
     def _join_game(self):
         pass
@@ -185,7 +180,8 @@ class GUI(UI):
         self._frame = frame
         self.__buttons = [[None]*8 for _ in range(8)]  
         self._eventno = 1 
-        self.__game_win = game_window                          
+        self.__game_win = game_window
+
         for row, col in product(range(0,8), range(0,8)):
             img = self._text_to_image(row, col)
             cmd = lambda r=row, c=col: self.__event_handler(self._eventno, r, c)
@@ -193,18 +189,14 @@ class GUI(UI):
             button = Button(frame,image=img,command=cmd)
             button.grid(row=row,column=col,sticky=N+S+W+E)
             self.__buttons[row][col] = button
-        
+
         self._turn = StringVar()
         self._turn.set(f"Turn: {self.__game._player}")
         turnlabel = Label(frame, textvariable=self._turn).grid(row=9,column=1,columnspan=2,sticky=N+S+W+E)
 
-        try:
-            if self.__playing_comp == True and self.__game._player == self._computer_piece:
+        if self.__playing_comp == True and self.__game._player == self._computer_piece:
                 self.__make_ai_move()
-        except:
-            self._BLANKSQUARE = self._BLANKSQUARE
 
-        #USE THIS FOR THE COMPUTER PLAYER
         
         #IF CUSTOM MAPS(UNLIKELY) THIS WILL BE NEEDED
         #takes = self.__game.check_for_takes()
@@ -301,14 +293,15 @@ class GUI(UI):
     
     
     def __make_move(self, row, col, row_to_move, col_to_move):
-        if row_to_move not in self.possiblerow:
-            self._eventno = 2
-            self.__console.insert(END, "Not able to move there\n")
-            return
-        if col_to_move not in self.possiblecol:
-            self._eventno = 2
-            self.__console.insert(END, "Not able to move there\n")
-            return
+        if self.__playing_comp == True and self.__game._player != self._computer_piece:
+            if row_to_move not in self.possiblerow:
+                self._eventno = 2
+                self.__console.insert(END, "Not able to move there\n")
+                return
+            if col_to_move not in self.possiblecol:
+                self._eventno = 2
+                self.__console.insert(END, "Not able to move there\n")
+                return
         if row_to_move in [row-2,row+2]:
             take_used = True
         else:   
@@ -322,7 +315,12 @@ class GUI(UI):
             else:
                 self.__game._player = Game.P1
         
+
+
         self._update_board()
+
+
+
         if take != 0:
             self.__console.insert(END,"Another take is available\n")
 
@@ -336,6 +334,9 @@ class GUI(UI):
             finished_text = f"Winner was: {self.__winner}"
             Message(finished_game,text=finished_text).pack(fill=X)
             Button(finished_game, text="Dismiss",command=finished_game.destroy).pack(fill=X)
+
+        if self.__playing_comp == True and self.__game._player == self._computer_piece:
+                self.__make_ai_move()
 
 
     def run(self):
