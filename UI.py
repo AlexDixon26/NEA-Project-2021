@@ -126,10 +126,17 @@ class GUI(UI):
     
     def __make_ai_move(self):
         if self.__game._player == Game.P1:
-            results = self.__game.find_black_player_available_moves()
+            results, takes = self.__game.find_black_player_available_moves()
         elif self.__game._player == Game.P2:
-            results = self.__game.find_white_player_available_moves()
-        move = self._Computer.get_move(results)
+            results, takes = self.__game.find_white_player_available_moves()
+        move = self._Computer.get_move(results, takes)
+
+        old_x = move[0]
+        old_y = move[1]
+        new_x = move[2]
+        new_y = move[3]
+
+        self.__make_move(old_x,old_y,new_x,new_y)       
 
         if self.__game._player == Game.P1:
             self.__game._player = Game.P2

@@ -260,6 +260,11 @@ class Game:
                     if self._check_white_player_jumps(m, n, m + 1, n + 1, m + 2, n + 2):
                         available_jumps.append([m, n, m + 2, n + 2])
 
+        if len(available_jumps) != 0:
+            return available_jumps, True
+        else:
+            return available_moves, False
+
     def find_black_player_available_moves(self):
         available_moves = []
         available_jumps = []
@@ -293,9 +298,9 @@ class Game:
                         available_jumps.append([m, n, m + 2, n + 2])
         
         if len(available_jumps) != 0:
-            return available_jumps
+            return available_jumps, True
         else:
-            return available_moves
+            return available_moves, False
 
     def _check_black_player_moves(self, old_x, old_y, new_x, new_y):
         possible = [Game.P1King,Game.P1Man] 
@@ -307,7 +312,7 @@ class Game:
             return False
         if self._board[new_x][new_y] != Game._EMPTY:
             return False
-        if self._board[new_x][new_y] not in possible:
+        if self._board[old_x][old_y] not in possible:
             return False
         if self._board[new_x][new_y] == Game._EMPTY:
             return True
@@ -322,7 +327,7 @@ class Game:
             return False
         if self._board[new_x][new_y] != Game._EMPTY:
             return False
-        if self._board[new_x][new_y] not in possible:
+        if self._board[old_x][old_y] not in possible:
             return False
         if self._board[new_x][new_y] == Game._EMPTY:
             return True

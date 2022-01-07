@@ -12,23 +12,17 @@ class AI(Player):
         self._difficulty = difficulty
         self.__piece = [AI.P1Man,AI.P1King] if piece == "Black" else [AI.P2Man,AI.P2King]
 
-    def get_move(self, movelist):
-        random = randint(0,len(movelist)-1)
-        temp = movelist[random]
-        numeric_filter = filter(str.isdigit, str(temp))
-        temp = "".join(numeric_filter)
-        temp = temp[:-1]
-        moved_from = temp[0:2]
-        temp = temp[2:]
-        list = []
-        for item in temp:
-            list.append(item)
-        list2 = []
-        for val in range(0,len(list),2):
-            item = str(list[val] + list[val+1])
-            list2.append(item)
-        #
-        #       REMEMBER THAT THE MOVED_FROM IS (row,col) but each movable space is (col-1,row-1) 
-        #
+    def get_move(self, movelist, takes):
+        
+
+        # FIRST 2 numbers are current piece (col, row)
+        # SECOND 2 numbers are available move (col, row)
         if self._difficulty == "Easy":
-            return 1
+            r = randint(0,len(movelist)-1)
+            if takes == False:
+                return movelist[r]
+            else:
+                pass
+                #
+                #       WRITE CODE TO CHECK IF THE PIECE CAN TAKE AGAIN (MAYBE NEW FUNCTION?)
+                #
