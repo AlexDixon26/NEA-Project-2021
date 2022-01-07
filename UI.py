@@ -15,6 +15,7 @@ class UI(ABC):
 
 class GUI(UI):
     def __init__(self):
+        self._inprogress = False
         self.__playing_comp = False
         self.__started = False
         self.__finished = False
@@ -81,6 +82,9 @@ class GUI(UI):
         self._play_menu = play_menu
 
     def _play_computer(self):
+        if self._inprogress:
+            return
+        self._inprogress = True
         difficulty = ""
         self.play_computer = Toplevel(self.__root)
         self.play_computer.title("Choose Computer Difficulty")
@@ -112,9 +116,8 @@ class GUI(UI):
 
     def computer_versus(self,difficulty):
         piece = r(1,2)
-        #piece = "Black" if piece == 1 else "White"
-        piece = "White"
-        #Create New Computer Opponent
+        piece = "Black" if piece == 1 else "White"
+        piece = "Black"
         self._Computer = AI(difficulty,piece)
         self.play_computer.destroy()
         self._takes = []
@@ -165,6 +168,9 @@ class GUI(UI):
             return
 
     def _play_offline(self):
+        if self._inprogress:
+            return
+        self._inprogress = True
         self._play_menu.destroy()
         self._takes = []
         self.__console.delete("1.0", END)
