@@ -1,7 +1,3 @@
-from Client import Client
-from Human import Human
-from AI import AI
-
 class GameError(Exception):
     pass
 
@@ -27,36 +23,36 @@ class Game:
         self._board = [[Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man],[Game.P2Man,Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man,Game._EMPTY],[Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man],[Game._EMPTY]*Game._DIM,[Game._EMPTY]*Game._DIM,[Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY],[Game._EMPTY,Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY,Game.P1Man],[Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY]]
         self._player = Game.P1
         
-    def _do_move(self, row, col, row_to_move, col_to_move, take_used):
+    def _do_move(self, row, col, row_to_move, col_to_move, take_used, board, player):
         #Validation of piece being there
         takes = 0
-        if self._player == Game.P1:
+        if player == Game.P1:
             possible = [Game.P1King,Game.P1Man]
         else: 
             possible = [Game.P2King,Game.P2Man]
         row -= 1
         col -= 1
-        if self._board[row][col] not in possible:
+        if board[row][col] not in possible:
             raise GameError("Not your piece")
         row_to_move -= 1
         col_to_move -= 1
-        if self._board[row][col] == Game.P1Man or self._board[row][col] == Game.P2Man:
+        if board[row][col] == Game.P1Man or board[row][col] == Game.P2Man:
             man_or_king = "S"
         else:
             man_or_king = "K"
         if take_used == False:
-            if self._board[row][col] != Game._EMPTY:
-                self._board[row][col] = Game._EMPTY
+            if board[row][col] != Game._EMPTY:
+                board[row][col] = Game._EMPTY
                 if man_or_king == "S":
-                    self._board[row_to_move][col_to_move] = Game.P1Man if self._player is Game.P1 else Game.P2Man
+                    board[row_to_move][col_to_move] = Game.P1Man if self._player is Game.P1 else Game.P2Man
                 else:
-                    self._board[row_to_move][col_to_move] = Game.P1King if self._player is Game.P1 else Game.P2King
+                    board[row_to_move][col_to_move] = Game.P1King if self._player is Game.P1 else Game.P2King
         else:
-             if self._board[row][col] != Game._EMPTY:
-                self._board[row][col] = Game._EMPTY
+             if board[row][col] != Game._EMPTY:
+                board[row][col] = Game._EMPTY
                 if man_or_king == "S":
-                    self._board[row_to_move][col_to_move] = Game.P1Man if self._player is Game.P1 else Game.P2Man
-                    self._board[int((row_to_move + row)/2)][int((col_to_move + col)/2)] = Game._EMPTY
+                    board[row_to_move][col_to_move] = Game.P1Man if self._player is Game.P1 else Game.P2Man
+                    board[int((row_to_move + row)/2)][int((col_to_move + col)/2)] = Game._EMPTY
                     try:
                         _, takes = self._get_legal_moves(row_to_move+1, col_to_move+1, False)
                     except:
@@ -68,8 +64,8 @@ class Game:
                         if row == 6:
                             takes = 0
                 else:
-                    self._board[row_to_move][col_to_move] = Game.P1King if self._player is Game.P1 else Game.P2King
-                    self._board[int((row_to_move + row)/2)][int((col_to_move + col)/2)] = Game._EMPTY
+                    board[row_to_move][col_to_move] = Game.P1King if self._player is Game.P1 else Game.P2King
+                    board[int((row_to_move + row)/2)][int((col_to_move + col)/2)] = Game._EMPTY
                     try:
                         _, takes = self._get_legal_moves(row_to_move+1,col_to_move+1, False)
                     except:

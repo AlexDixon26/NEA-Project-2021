@@ -1,6 +1,7 @@
 from Player import Player
 from random import randint
 from copy import deepcopy
+from Game import Game
 
 class AI(Player):
     P1Man = "⚫ "
@@ -71,30 +72,50 @@ class AI(Player):
 
         return result + (mine - opp) * 1000
 
+    def evaluate_states(self):
+        current_state = Node(deepcopy(Game._board))
+
+        first_computer_moves = current_state.get_children(True)
+        dict = {}
+        for i in range(len(first_computer_moves)):
+            child = first_computer_moves[i]
+            # minimax algorithm here
+            dict[value] = child
+        new_board = dict[max(dict)].get_board()
+        move = dict[max(dict)].get_move()
+        return move
+
+
 
 class Node:
-    def __init__(self, board, move=None, parent=None, value=None):
+    def __init__(self, board, move, parent, value):
         self.board = board
         self.value = value
         self.move = move
         self.parent = parent
 
-    def get_children(self, minimizing_player):
+    def get_children(self, min_player):
         current_state = deepcopy(self.board)
         available_moves = []
         children_states = []
-        if minimizing_player == True:
-            #find the computers moves
-            pass
+        if min_player == True:
+            available_moves, takes = Game.find_white_player_available_moves(current_state)
+            player = "White"
         else:
-            #find the players moves
-            pass
+            available_moves, takes = Game.find_black_player_available_moves(current_state)
+            player = "Black"
         for i in range(len(available_moves)):
             old_i = available_moves[i][0]
             old_j = available_moves[i][1]
             new_i = available_moves[i][2]
             new_j = available_moves[i][3]
             board_state = deepcopy(current_state)
-            #make a move on the current board state
+            Game._do_move(old_i+1,old_j+1,new_i+1,new_j+1,takes,board_state,player)
             children_states.append(Node(board_state, [old_i, old_j, new_i, new_j]))
         return children_states
+    
+    def get_board(self):
+        return self.board
+
+    def get_move(self):
+        return self.move

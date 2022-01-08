@@ -310,7 +310,7 @@ class GUI(UI):
             take_used = True
         else:   
             take_used = False
-        take = self.__game._do_move(row+1, col+1, row_to_move+1, col_to_move +1, take_used)
+        take = self.__game._do_move(row+1, col+1, row_to_move+1, col_to_move +1, take_used, self.__game._board, self.__game._player)
 
         #DO THAT YOU FUCK thank you
         if take == 0:
@@ -515,7 +515,7 @@ class Terminal(UI):
                     if col_to_move not in potential_columns:
                         print("You cannot move there!")
                         raise ValueError
-                    takes = self._game._do_move(row, col, row_to_move, col_to_move, take_used)
+                    takes = self._game._do_move(row, col, row_to_move, col_to_move, take_used, self._game._board, self._game._player)
                     row = row_to_move
                     col = col_to_move
                     if takes != 0:
@@ -531,7 +531,7 @@ class Terminal(UI):
                         if col_to_move not in potential_columns:
                             print("You cannot move there!")
                             raise ValueError
-                        takes = self._game._do_move(row, col, row_to_move, col_to_move, take_used)
+                        takes = self._game._do_move(row, col, row_to_move, col_to_move, take_used, self._game._board, self._game._player)
                         row = row_to_move
                         col = col_to_move
                         if takes != 0:
@@ -547,7 +547,7 @@ class Terminal(UI):
                             if col_to_move not in potential_columns:
                                 print("You cannot move there!")
                                 raise ValueError
-                            takes = self._game._do_move(row, col, row_to_move, col_to_move, take_used)
+                            takes = self._game._do_move(row, col, row_to_move, col_to_move, take_used, self._game._board, self._game._player)
 
                 except GameError:
                     print("not your piece to move!")
