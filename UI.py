@@ -115,24 +115,21 @@ class GUI(UI):
             command = extreme).pack(fill=X)
 
     def computer_versus(self,difficulty):
-        piece = r(1,2)
-        piece = "Black" if piece == 1 else "White"
-        piece = "Black"
-        self._Computer = AI(difficulty,piece)
+        self._Computer = AI(difficulty)
         self.play_computer.destroy()
         self._takes = []
         self.__console.delete("1.0", END)
         self.__playing_comp = True
         self.__game = Game()
         self.__finished = False
-        self._computer_piece = "White" if piece == "Black" else "Black"
+        self._computer_piece = "White"
         self._print_board()
     
     def __make_ai_move(self):
         if self.__game._player == Game.P1:
-            results, takes = self.__game.find_black_player_available_moves()
+            results, takes = self.__game.find_black_player_available_moves(self.__game._board)
         elif self.__game._player == Game.P2:
-            results, takes = self.__game.find_white_player_available_moves()
+            results, takes = self.__game.find_white_player_available_moves(self.__game._board)
         move = self._Computer.get_move(results, takes)
 
         old_x = move[0]
@@ -141,6 +138,7 @@ class GUI(UI):
         new_y = move[3]
 
         self.__make_move(old_x,old_y,new_x,new_y)
+        self._update_board()
         self._turn.set(f"Turn: {self.__game._player}")
 
     def _join_game(self):
