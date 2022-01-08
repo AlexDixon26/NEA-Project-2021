@@ -1,5 +1,6 @@
 from Player import Player
 from random import randint
+from copy import deepcopy
 
 class AI(Player):
     P1Man = "⚫ "
@@ -69,3 +70,31 @@ class AI(Player):
                     opp += 1
 
         return result + (mine - opp) * 1000
+
+
+class Node:
+    def __init__(self, board, move=None, parent=None, value=None):
+        self.board = board
+        self.value = value
+        self.move = move
+        self.parent = parent
+
+    def get_children(self, minimizing_player):
+        current_state = deepcopy(self.board)
+        available_moves = []
+        children_states = []
+        if minimizing_player == True:
+            #find the computers moves
+            pass
+        else:
+            #find the players moves
+            pass
+        for i in range(len(available_moves)):
+            old_i = available_moves[i][0]
+            old_j = available_moves[i][1]
+            new_i = available_moves[i][2]
+            new_j = available_moves[i][3]
+            board_state = deepcopy(current_state)
+            #make a move on the current board state
+            children_states.append(Node(board_state, [old_i, old_j, new_i, new_j]))
+        return children_states
