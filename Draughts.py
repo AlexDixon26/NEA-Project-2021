@@ -1,4 +1,4 @@
-from UI import GUI, Terminal
+from UI import GUI
 from sys import argv
 
 def usage():   
@@ -11,8 +11,8 @@ t : play with the Terminal""")
 if __name__ == "__main__":
     if len(argv) != 2:
         usage()
-    elif argv[1] == "t":
-        ui = Terminal()
+    #elif argv[1] == "t":
+    #    ui = Terminal()
     elif argv[1] == "g":
         ui = GUI()
     else:

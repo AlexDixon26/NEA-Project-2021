@@ -115,22 +115,19 @@ class GUI(UI):
             command = extreme).pack(fill=X)
 
     def computer_versus(self,difficulty):
-        self._Computer = AI(difficulty)
         self.play_computer.destroy()
         self._takes = []
         self.__console.delete("1.0", END)
         self.__playing_comp = True
         self.__game = Game()
+        self._Computer = AI(difficulty, self.__game)
         self.__finished = False
         self._computer_piece = "White"
         self._print_board()
     
     def __make_ai_move(self):
-        if self.__game._player == Game.P1:
-            results, takes = self.__game.find_black_player_available_moves(self.__game._board)
-        elif self.__game._player == Game.P2:
-            results, takes = self.__game.find_white_player_available_moves(self.__game._board)
-        move = self._Computer.get_move(results, takes)
+        results, takes = self.__game.find_white_player_available_moves(self.__game._board)
+        move = self._Computer.get_move(results, self.__game._board)
 
         old_x = move[0]
         old_y = move[1]
@@ -148,8 +145,6 @@ class GUI(UI):
         pass
 
     def _help_callback(self):
-        if self.__started == False:
-            return
         help_instructions = Toplevel(self.__root)
         help_instructions.title("Rules")
         frame = Frame(help_instructions)
@@ -185,6 +180,8 @@ class GUI(UI):
         self.__buttons = [[None]*8 for _ in range(8)]  
         self._eventno = 1 
         self.__game_win = game_window
+        progress = lambda: (self._inprogress == False,game_window.destroy())
+        game_window.protocol("WM_DELETE_WINDOW", progress)
 
         for row, col in product(range(0,8), range(0,8)):
             img = self._text_to_image(row, col)
@@ -256,19 +253,27 @@ class GUI(UI):
             return
 
         try:
-            moves, takes = self.__game._get_legal_moves(row+1, col+1, False)
+            if self.__game._player == Game.P1:
+                moves, takes = self.__game.find_black_piece_moves(row,col,self.__game._board)
+            else:
+                moves, takes = self.__game.find_white_piece_moves(row,col,self.__game._board)
         except GameError:
             self._eventno = 1
             self.__console.insert(END, "That's not your peice to move! Pick again\n")
             return
-        for move in moves:
-            if takes != 0:
-                if int(move[0]) == int(row - 2) or int(move[0]) == int(row + 2):
-                    self.__game.print_possible_moves(move[0]+1,move[1]+1)
-            else:
-                self.__game.print_possible_moves(move[0]+1,move[1]+1)
-            self.possiblerow.append(move[0])
-            self.possiblecol.append(move[1])
+
+        if len(self.__game.check_for_takes()) != 0:
+            list = takes
+        else:
+            list = moves
+        
+        if list == []:
+            self._eventno = 1
+
+        for move in list:
+            self.__game.print_possible_moves(move[2]+1,move[3]+1)
+            self.possiblerow.append(move[2])
+            self.possiblecol.append(move[3])
         self._update_board()
 
     def _text_to_image(self, row, col):
@@ -310,10 +315,21 @@ class GUI(UI):
             take_used = True
         else:   
             take_used = False
-        take = self.__game._do_move(row+1, col+1, row_to_move+1, col_to_move +1, take_used, self.__game._board, self.__game._player)
+        try:
+            take = self.__game._do_move(row+1, col+1, row_to_move+1, col_to_move +1, take_used, self.__game._board, self.__game._player)
+        except GameError:
+            self.play_computer = Toplevel(self.__root)
+            self.play_computer.title("ERROR: Not a Viable move")
+            frame = Frame(self.play_computer)
+            frame.pack()
 
-        #DO THAT YOU FUCK thank you
-        if take == 0:
+            warning = StringVar()
+            warning.set(f"That's not a legal move/not a legal piece to move!")
+            rulesLabel = Label(frame, textvariable=warning).pack()
+            take = [1]
+            self._eventno = 1
+            self.__game.remove_possible_moves()
+        if take in [[],0]:
             if self.__game._player == Game.P1:
                 self.__game._player = Game.P2
             else:
@@ -338,6 +354,7 @@ class GUI(UI):
             finished_text = f"Winner was: {self.__winner}"
             Message(finished_game,text=finished_text).pack(fill=X)
             Button(finished_game, text="Dismiss",command=finished_game.destroy).pack(fill=X)
+            self.__game_win.destroy()
 
         if self.__playing_comp == True and self.__game._player == self._computer_piece:
                 self.__make_ai_move()
@@ -467,114 +484,115 @@ class GUI(UI):
         self.__started = True
 
 
-class Terminal(UI):
-    def __init__(self):
-        self._game = Game(Game.Human,Game.Human)
-
-
-    def run(self):
-        while not self._game._finished_game:
-            print(self._game)
-            print(self._game.whos_move())
-            try:
-                print("Enter Row and Column of piece to move:")
-                row = int(input("row: "))
-                col = int(input("column: "))
-            except:
-                print("non numeric input")
-                continue
-            if 1 <= row <= 8 and 1 <= col <= 8:
-                try:
-                    legal_moves, takes = self._game._get_legal_moves(row, col, False)
-                    print("Legal moves for this piece: ")
-                    if len(legal_moves) == 0:
-                        takes = 0
-                        print("This piece cannot move")
-                    take_used = False
-                    result = ""
-                    potential_rows = []
-                    potential_columns = []
-                    if takes != 0:
-                        print("There is a take[s] available, which you must do")
-                        take_used = True
-                        current_player = self._game.return_player()
-                        potential_rows, potential_columns = self.print_out_moves(legal_moves, current_player, row)
-                    else:
-                        for i in legal_moves:
-                            result = ""
-                            for num in i:
-                                result += str(num + 1)
-                            print(result[0] + "," + result[1])
-                            potential_rows.append(int(result[0]))
-                            potential_columns.append(int(result[1]))
-                    row_to_move = int(input("Enter row to move to:"))
-                    col_to_move = int(input("Enter col to move to:"))
-                    if row_to_move not in potential_rows:
-                        print("You cannot move there!")
-                        raise ValueError
-                    if col_to_move not in potential_columns:
-                        print("You cannot move there!")
-                        raise ValueError
-                    takes = self._game._do_move(row, col, row_to_move, col_to_move, take_used, self._game._board, self._game._player)
-                    row = row_to_move
-                    col = col_to_move
-                    if takes != 0:
-                        print(self._game)
-                        print("Another Take[s] is available")
-                        legal_moves, takes = self._game._get_legal_moves(row_to_move, col_to_move, False)
-                        potential_rows, potential_columns = self.print_out_moves(legal_moves, current_player, row_to_move)
-                        row_to_move = int(input("Enter row to move to:"))
-                        col_to_move = int(input("Enter col to move to:"))
-                        if row_to_move not in potential_rows:
-                            print("You cannot move there!")
-                            raise ValueError
-                        if col_to_move not in potential_columns:
-                            print("You cannot move there!")
-                            raise ValueError
-                        takes = self._game._do_move(row, col, row_to_move, col_to_move, take_used, self._game._board, self._game._player)
-                        row = row_to_move
-                        col = col_to_move
-                        if takes != 0:
-                            print(self._game)
-                            print("Another Take[s] is available")
-                            legal_moves, takes = self._game._get_legal_moves(row, col, False)
-                            potential_rows, potential_columns = self.print_out_moves(legal_moves, current_player, row)
-                            row_to_move = int(input("Enter row to move to:"))
-                            col_to_move = int(input("Enter col to move to:"))
-                            if row_to_move not in potential_rows:
-                                print("You cannot move there!") 
-                                raise ValueError
-                            if col_to_move not in potential_columns:
-                                print("You cannot move there!")
-                                raise ValueError
-                            takes = self._game._do_move(row, col, row_to_move, col_to_move, take_used, self._game._board, self._game._player)
-
-                except GameError:
-                    print("not your piece to move!")
-                except ValueError:
-                    continue
-            else:
-                print("Row and column must be within 1 - 8")
-        print(self._game)
-        print("Game Finished!")
-        w = self._game.finished
-        print(f"The winner was {w}")
-    
-    def print_out_moves(self, legal_moves_list, current_player, row):
-        potential_columns = []
-        potential_rows = []
-        for i in legal_moves_list:
-            result = ""
-            for num in i:
-                result += str(num + 1)
-            if current_player == "Black":
-                if int(result[0]) == int(row - 2) or int(result[0]) == int(row + 2):
-                    print(result[0] + "," + result[1])
-                    potential_rows.append(int(result[0]))
-                    potential_columns.append(int(result[1]))
-            else:
-                if int(result[0]) == int(row + 2) or int(result[0]) == int(row - 2):
-                    print(result[0] + "," + result[1])
-                    potential_rows.append(int(result[0]))
-                    potential_columns.append(int(result[1]))
-        return potential_rows, potential_columns
+#class Terminal(UI):
+#    def __init__(self):
+#        self._game = Game()
+#
+#
+#    def run(self):
+#        while not self._game._finished_game:
+#            print(self._game)
+#            print(self._game.whos_move())
+#            try:
+#                print("Enter Row and Column of piece to move:")
+#                row = int(input("row: "))
+#                col = int(input("column: "))
+#            except:
+#                print("non numeric input")
+#                continue
+#            if 1 <= row <= 8 and 1 <= col <= 8:
+#                try:
+#                    #THIS WILL NEED TO BE FIXED IF MR. GWILT SAYS HE WILL RUN THE TERMINAL
+#                    legal_moves, takes = self._game._get_legal_moves(row, col, False)
+#                    print("Legal moves for this piece: ")
+#                    if len(legal_moves) == 0:
+#                        takes = 0
+#                        print("This piece cannot move")
+#                    take_used = False
+#                    result = ""
+#                    potential_rows = []
+#                    potential_columns = []
+#                    if takes != 0:
+#                        print("There is a take[s] available, which you must do")
+#                        take_used = True
+#                        current_player = self._game.return_player()
+#                        potential_rows, potential_columns = self.print_out_moves(legal_moves, current_player, row)
+#                    else:
+#                        for i in legal_moves:
+#                            result = ""
+#                            for num in i:
+#                                result += str(num + 1)
+#                            print(result[0] + "," + result[1])
+#                            potential_rows.append(int(result[0]))
+#                            potential_columns.append(int(result[1]))
+#                    row_to_move = int(input("Enter row to move to:"))
+#                    col_to_move = int(input("Enter col to move to:"))
+#                    if row_to_move not in potential_rows:
+#                        print("You cannot move there!")
+#                        raise ValueError
+#                    if col_to_move not in potential_columns:
+#                        print("You cannot move there!")
+#                        raise ValueError
+#                    takes = self._game._do_move(row, col, row_to_move, col_to_move, take_used, self._game._board, self._game._player)
+#                    row = row_to_move
+#                    col = col_to_move
+#                    if takes != 0:
+#                        print(self._game)
+#                        print("Another Take[s] is available")
+#                        legal_moves, takes = self._game._get_legal_moves(row_to_move, col_to_move, False)
+#                        potential_rows, potential_columns = self.print_out_moves(legal_moves, current_player, row_to_move)
+#                        row_to_move = int(input("Enter row to move to:"))
+#                        col_to_move = int(input("Enter col to move to:"))
+#                        if row_to_move not in potential_rows:
+#                            print("You cannot move there!")
+#                            raise ValueError
+#                        if col_to_move not in potential_columns:
+#                            print("You cannot move there!")
+#                            raise ValueError
+#                        takes = self._game._do_move(row, col, row_to_move, col_to_move, take_used, self._game._board, self._game._player)
+#                        row = row_to_move
+#                        col = col_to_move
+#                        if takes != 0:
+#                            print(self._game)
+#                            print("Another Take[s] is available")
+#                            legal_moves, takes = self._game._get_legal_moves(row, col, False)
+#                            potential_rows, potential_columns = self.print_out_moves(legal_moves, current_player, row)
+#                            row_to_move = int(input("Enter row to move to:"))
+#                            col_to_move = int(input("Enter col to move to:"))
+#                            if row_to_move not in potential_rows:
+#                                print("You cannot move there!") 
+#                                raise ValueError
+#                            if col_to_move not in potential_columns:
+#                                print("You cannot move there!")
+#                                raise ValueError
+#                            takes = self._game._do_move(row, col, row_to_move, col_to_move, take_used, self._game._board, self._game._player)
+#
+#                except GameError:
+#                    print("not your piece to move!")
+#                except ValueError:
+#                    continue
+#            else:
+#                print("Row and column must be within 1 - 8")
+#        print(self._game)
+#        print("Game Finished!")
+#        w = self._game.finished
+#        print(f"The winner was {w}")
+#    
+#    def print_out_moves(self, legal_moves_list, current_player, row):
+#        potential_columns = []
+#        potential_rows = []
+#        for i in legal_moves_list:
+#            result = ""
+#            for num in i:
+#                result += str(num + 1)
+#            if current_player == "Black":
+#                if int(result[0]) == int(row - 2) or int(result[0]) == int(row + 2):
+#                    print(result[0] + "," + result[1])
+#                    potential_rows.append(int(result[0]))
+#                    potential_columns.append(int(result[1]))
+#            else:
+#                if int(result[0]) == int(row + 2) or int(result[0]) == int(row - 2):
+#                    print(result[0] + "," + result[1])
+#                    potential_rows.append(int(result[0]))
+#                    potential_columns.append(int(result[1]))
+#        return potential_rows, potential_columns
