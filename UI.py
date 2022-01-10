@@ -316,7 +316,7 @@ class GUI(UI):
         else:   
             take_used = False
         try:
-            take = self.__game._do_move(row+1, col+1, row_to_move+1, col_to_move +1, take_used, self.__game._board, self.__game._player)
+            take = self.__game.do_move(row+1, col+1, row_to_move+1, col_to_move +1, take_used, self.__game._board, self.__game._player)
         except GameError:
             self.play_computer = Toplevel(self.__root)
             self.play_computer.title("ERROR: Not a Viable move")
@@ -344,10 +344,10 @@ class GUI(UI):
         if take != 0:
             self.__console.insert(END,"Another take is available\n")
 
-        if self.__game._finished_game is not None:
+        if self.__game.finished_game is not None:
             self.__finished = True
-            self.__console.insert(END, f"The winner was {self.__game._finished_game}\n")
-            self.__winner = self.__game._finished_game
+            self.__console.insert(END, f"The winner was {self.__game.finished_game}\n")
+            self.__winner = self.__game.finished_game
             finished_game = Toplevel()
             finished_game.title("Game Finished")
             frame = Frame(finished_game)

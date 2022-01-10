@@ -26,7 +26,7 @@ class Game:
         self._board = [[Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man],[Game.P2Man,Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man,Game._EMPTY],[Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man],[Game._EMPTY]*Game._DIM,[Game._EMPTY]*Game._DIM,[Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY],[Game._EMPTY,Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY,Game.P1Man],[Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY]]
         self._player = Game.P1
         
-    def _do_move(self, row, col, row_to_move, col_to_move, take_used, board, player):
+    def do_move(self, row, col, row_to_move, col_to_move, take_used, board, player):
         takes = 0
         if player == Game.P1:
             possible = [Game.P1King,Game.P1Man]
@@ -308,7 +308,7 @@ class Game:
         return result
 
     @property
-    def _finished_game(self):
+    def finished_game(self):
         for p in [Game.P1Man,Game.P2Man]:
             fin = True
             for row in range(Game._DIM):

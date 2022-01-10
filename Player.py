@@ -5,4 +5,4 @@ class Player(ABC):
         pass
 
     def get_move(self):
-        raise NotImplementedError
+        raise NotImplementedError   
