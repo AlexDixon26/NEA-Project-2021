@@ -1,13 +1,14 @@
 from Game import Game, GameError
 from abc import ABC, abstractmethod
 from tkinter import *
-# END, Button, Tk, Toplevel, Frame, X, StringVar, Text,Scrollbar, LEFT, RIGHT, Y, Grid, N, S, W, E, Message, Label, Image, PhotoImage
 from itertools import product
 from Human import Human
 from AI import AI
 from random import randint as r
 import time
 
+
+#Super Class to GUI
 class UI(ABC):
     @abstractmethod
     def run(self):
@@ -15,27 +16,32 @@ class UI(ABC):
 
 class GUI(UI):
     def __init__(self):
+        #Initialising the GUI
         self._inprogress = False
         self.__playing_comp = False
         self.__started = False
         self.__finished = False
+        #Making the main window of my GUI
         root = Tk()
         root.title("Draughts")
         frame = Frame(root)
         frame.pack()
         self.__root = root
         self.login()
-        self._WHITECOUNTER = PhotoImage(file="white counter.png")
-        self._BLACKCOUNTER = PhotoImage(file="black counter.png")
-        self._BLANKSQUARE = PhotoImage(file="blank square.png")
-        self._WHITEKING = PhotoImage(file="white king.png")
-        self._BLACKKING = PhotoImage(file="black king.png")
-        self._POSSIBLEMOVE = PhotoImage(file="possible move.png")
+        #Importing the images for the pieces used in the game
+        self._WHITECOUNTER = PhotoImage(file="images/white counter.png")
+        self._BLACKCOUNTER = PhotoImage(file="images/black counter.png")
+        self._BLANKSQUARE = PhotoImage(file="images/blank square.png")
+        self._WHITEKING = PhotoImage(file="images/white king.png")
+        self._BLACKKING = PhotoImage(file="images/black king.png")
+        self._POSSIBLEMOVE = PhotoImage(file="images/possible move.png")
+        #Try/Except to set the current Event Number to 1 unless it has already been defined
         try:
             self._eventno = self._eventno
         except AttributeError:
             self._eventno = 1
 
+        #Buttons for the main window
         Button(
             frame,
             text='Tutorials/Info',
@@ -51,7 +57,7 @@ class GUI(UI):
             text='Quit',
             command = self._quit_callback).pack(fill=X)
 
-
+        #Defining the console
         console = Text(frame,height=15,width=50)
         scroll = Scrollbar(frame)
         scroll.pack(side=RIGHT,fill=Y)
@@ -62,6 +68,9 @@ class GUI(UI):
         self.__console = console
 
     def _play_callback(self):
+        #Window for user to input gamemode
+
+        #if a game has already begun, do not open this window
         if self.__started == False:
             return
         play_menu = Toplevel(self.__root)
@@ -82,6 +91,9 @@ class GUI(UI):
         self._play_menu = play_menu
 
     def _play_computer(self):
+        #Window for playing against the computer
+
+        #if a game is in progress, do not open this window
         if self._inprogress:
             return
         self._inprogress = True
@@ -91,10 +103,13 @@ class GUI(UI):
         frame = Frame(self.play_computer)
         frame.pack()
 
+        #Choosing a computer difficulty
         warning = StringVar()
         warning.set(f"Choose a Computer Difficulty")
         rulesLabel = Label(frame, textvariable=warning).pack()
     
+
+        #Using a lambda to set the difficulty
         easy = lambda: [self.computer_versus("Easy")]
         hard = lambda: [self.computer_versus("Hard")]
         extreme = lambda: [self.computer_versus("Extreme")]
@@ -115,18 +130,29 @@ class GUI(UI):
             command = extreme).pack(fill=X)
 
     def computer_versus(self,difficulty):
+        #Function that prints the board to play against the computer
         self.play_computer.destroy()
         self._takes = []
+
+        #Empties the console
         self.__console.delete("1.0", END)
         self.__playing_comp = True
+
+        #Creates a new game
         self.__game = Game()
+
+        #Creates a new computer opponent
         self._Computer = AI(difficulty, self.__game)
         self.__finished = False
         self._computer_piece = "White"
         self._print_board()
     
     def __make_ai_move(self):
-        results, takes = self.__game.find_white_player_available_moves(self.__game._board)
+        #function to make the computer player move
+        results = 0
+        takes = 0
+        play = lambda: [results, takes == self.__game.find_white_player_available_moves(self.__game._board)]
+        self.__game_win.after(500, play)
         move = self._Computer.get_move(results, self.__game._board)
 
         old_x = move[0]
@@ -135,16 +161,13 @@ class GUI(UI):
         new_y = move[3]
 
         self.__make_move(old_x,old_y,new_x,new_y)
+
+        #Updating the board
         self._update_board()
         self._turn.set(f"Turn: {self.__game._player}")
 
-    def _join_game(self):
-        pass
-
-    def _create_game(self):
-        pass
-
     def _help_callback(self):
+        #Main window for the rules and help class
         help_instructions = Toplevel(self.__root)
         help_instructions.title("Rules")
         frame = Frame(help_instructions)
@@ -155,23 +178,27 @@ class GUI(UI):
         rulesLabel = Label(frame, textvariable=rules).pack()
 
     def _quit_callback(self):
+        #Quits the main program
         if self.__started:
             self.__root.quit()
         else:
             return
 
     def _play_offline(self):
+        #Function for printing the board when playing player versus player
         if self._inprogress:
             return
         self._inprogress = True
         self._play_menu.destroy()
         self._takes = []
         self.__console.delete("1.0", END)
-        self.__game = Game() #Game.Ai/Human/Client,Game.Ai/Human/Client in brackets CHANGE THIS LATER TO BE WHICHEVER IS DECIDED UPON
+        #creates a new game class
+        self.__game = Game()
         self.__finished = False
         self._print_board()
     
     def _print_board(self):
+        #Function to print the board
         game_window = Toplevel(self.__root)
         game_window.title("Draughts Board")
         frame = Frame(game_window)
@@ -180,9 +207,16 @@ class GUI(UI):
         self.__buttons = [[None]*8 for _ in range(8)]  
         self._eventno = 1 
         self.__game_win = game_window
-        progress = lambda: (self._inprogress == False,game_window.destroy())
-        game_window.protocol("WM_DELETE_WINDOW", progress)
+        game_window.protocol("WM_DELETE_WINDOW", self._quit_from_game)
 
+        #Menu 
+        menubar = Menu(game_window)
+        filemenu = Menu(menubar, tearoff=0)
+        filemenu.add_command(label="Exit", command=self._quit_from_game)
+        menubar.add_cascade(label="Menu", menu=filemenu)    
+        game_window.config(menu=menubar)
+
+        #printing the board
         for row, col in product(range(0,8), range(0,8)):
             img = self._text_to_image(row, col)
             cmd = lambda r=row, c=col: self.__event_handler(self._eventno, r, c)
@@ -195,17 +229,23 @@ class GUI(UI):
         self._turn.set(f"Turn: {self.__game._player}")
         turnlabel = Label(frame, textvariable=self._turn).grid(row=9,column=1,columnspan=2,sticky=N+S+W+E)
 
+        #If it is the AI's turn, then call the function to make the ai move
         if self.__playing_comp == True and self.__game._player == self._computer_piece:
                 self.__make_ai_move()
 
-        
-        #IF CUSTOM MAPS(UNLIKELY) THIS WILL BE NEEDED
-        #takes = self.__game.check_for_takes()
-        #if takes != []:
-        #    self.__console.insert(END,"There are take[s] available", str(takes), "\n")
+    def _quit_from_game(self):
+        #Quiting the game/Saving
+        quit_instructions = Toplevel(self.__root)
+        quit_instructions.title("Quit the game?")
+        frame = Frame(quit_instructions)
+        frame.pack()
 
+        warning = StringVar()
+        warning.set(f"Do you wish to quit the game?") #Save the game function here
+        Label(frame, textvariable=warning).pack()
 
     def __event_handler(self, eventno, row, col):
+        #Algorithm to determine whether the user has just clicked on a piece to check if it is to be moved or whether the user has clicked on a place to move to it
         if self.__finished:
             return
         if eventno == 1:
@@ -221,23 +261,29 @@ class GUI(UI):
             self._eventno = 1
             self.__make_move(self._row_of_curr, self._col_of_curr, row, col)
             self._turn.set(f"Turn: {self.__game._player}")
+            takes = []
             takes = self.__game.check_for_takes()
             if takes != []:
                 self.__console.insert(END,"There are take[s] available", str(takes), "\n")
             self._takes = takes
 
     def __remove_poss(self):
+        #removes the possible moves from the board
         self.__game.remove_possible_moves()
+
+        #updates the board
         self._update_board()
         self._eventno = 1
 
     def __check_poss_moves(self, row, col):
+        #Checks whether the user has picked a piece that is theirs to move, using algorithms from game class
         self.possiblerow = []
         self.possiblecol = []
         movelist = []
         succeed = False
         if self.__finished:
             return
+        # Creates a list of all possible moves
         for move in self._takes:
             strmove = ""
             for num in move:
@@ -247,11 +293,13 @@ class GUI(UI):
             if row == int(item[0])-1 and col == int(item[1])-1:
                 succeed = True
             
+        #checks if the piece is able to move
         if succeed == False and self._takes != []:
             self._eventno = 1
             self.__console.insert(END, "This peice cannot move, because there are takes available elsewhere\n")
             return
 
+        #Uses game classes to calculate possible moves for the piece to make
         try:
             if self.__game._player == Game.P1:
                 moves, takes = self.__game.find_black_piece_moves(row,col,self.__game._board)
@@ -262,6 +310,7 @@ class GUI(UI):
             self.__console.insert(END, "That's not your peice to move! Pick again\n")
             return
 
+        #list of possible moves
         if len(self.__game.check_for_takes()) != 0:
             list = takes
         else:
@@ -270,6 +319,7 @@ class GUI(UI):
         if list == []:
             self._eventno = 1
 
+        #adds the move to a list of possible moves that the do move function uses
         for move in list:
             self.__game.print_possible_moves(move[2]+1,move[3]+1)
             self.possiblerow.append(move[2])
@@ -277,6 +327,7 @@ class GUI(UI):
         self._update_board()
 
     def _text_to_image(self, row, col):
+        #changes each character piece in the board to an image 
         b = self.__game.at(row,col)
         if b == "⚫ ":
             img = self._BLACKCOUNTER
@@ -295,6 +346,7 @@ class GUI(UI):
         return img
 
     def _update_board(self):
+        #updates the board
         for row, col in product(range(8),range(8)):
             img = self._text_to_image(row, col)
             self.__buttons[row][col].config(image=img)
@@ -302,7 +354,10 @@ class GUI(UI):
     
     
     def __make_move(self, row, col, row_to_move, col_to_move):
-        if self.__playing_comp == True and self.__game._player != self._computer_piece:
+        #function to make a move
+        if self.__playing_comp == True and self.__game._player == self._computer_piece:
+            self._eventno = self._eventno
+        else:
             if row_to_move not in self.possiblerow:
                 self._eventno = 2
                 self.__console.insert(END, "Not able to move there\n")
@@ -322,7 +377,6 @@ class GUI(UI):
             self.play_computer.title("ERROR: Not a Viable move")
             frame = Frame(self.play_computer)
             frame.pack()
-
             warning = StringVar()
             warning.set(f"That's not a legal move/not a legal piece to move!")
             rulesLabel = Label(frame, textvariable=warning).pack()
@@ -344,6 +398,7 @@ class GUI(UI):
         if take != 0:
             self.__console.insert(END,"Another take is available\n")
 
+        #checks if game won
         if self.__game.finished_game is not None:
             self.__finished = True
             self.__console.insert(END, f"The winner was {self.__game.finished_game}\n")
@@ -361,9 +416,11 @@ class GUI(UI):
 
 
     def run(self):
+        #Run the main game
         self.__root.mainloop()
 
     def login(self):
+        #Login TopLevel
         login = Toplevel(self.__root)
         login.title("Login/Signup")
         login.geometry("300x250")
@@ -386,7 +443,8 @@ class GUI(UI):
 
         self.__login = login
     
-    def _loginmenu(self)    :
+    def _loginmenu(self):
+        #Menu to log in
         login = Toplevel(self.__login)
         login.title("Login")
         login.geometry("300x250")
@@ -410,11 +468,13 @@ class GUI(UI):
         Button(login, text = "Login", width = 10, height = 1, command = self.login_user).pack()
 
     def login_user(self):
+        #Searches the login database for the users credentials, if found logs them in if not retrys
         #DO THIS
         pass
 
     def register_user(self):
-        if self.__password_check != password.get():
+        #Registers the user
+        if self.__password_check != password_entry.get():
             failure = Toplevel(self.__login)
             failure.title("Sign Up Failure")
             failure.geometry("300x300")
@@ -437,6 +497,7 @@ class GUI(UI):
         self.__started = True
 
     def _signup(self):
+        #Sign Up menu, where player inputs new username/password
         signup = Toplevel(self.__login)
         signup.title("Sign Up")
         signup.geometry("300x250")
@@ -466,6 +527,7 @@ class GUI(UI):
 
 
     def _continue_as_guest(self):
+        #If the player does not wish to log in, they can continue as a guest
         cont_guest = Toplevel(self.__login)
         cont_guest.title("Warning - Continuing as Guest")
         frame = Frame(cont_guest)
@@ -482,117 +544,3 @@ class GUI(UI):
             command = button_lambda).pack(fill=X)
 
         self.__started = True
-
-
-#class Terminal(UI):
-#    def __init__(self):
-#        self._game = Game()
-#
-#
-#    def run(self):
-#        while not self._game._finished_game:
-#            print(self._game)
-#            print(self._game.whos_move())
-#            try:
-#                print("Enter Row and Column of piece to move:")
-#                row = int(input("row: "))
-#                col = int(input("column: "))
-#            except:
-#                print("non numeric input")
-#                continue
-#            if 1 <= row <= 8 and 1 <= col <= 8:
-#                try:
-#                    #THIS WILL NEED TO BE FIXED IF MR. GWILT SAYS HE WILL RUN THE TERMINAL
-#                    legal_moves, takes = self._game._get_legal_moves(row, col, False)
-#                    print("Legal moves for this piece: ")
-#                    if len(legal_moves) == 0:
-#                        takes = 0
-#                        print("This piece cannot move")
-#                    take_used = False
-#                    result = ""
-#                    potential_rows = []
-#                    potential_columns = []
-#                    if takes != 0:
-#                        print("There is a take[s] available, which you must do")
-#                        take_used = True
-#                        current_player = self._game.return_player()
-#                        potential_rows, potential_columns = self.print_out_moves(legal_moves, current_player, row)
-#                    else:
-#                        for i in legal_moves:
-#                            result = ""
-#                            for num in i:
-#                                result += str(num + 1)
-#                            print(result[0] + "," + result[1])
-#                            potential_rows.append(int(result[0]))
-#                            potential_columns.append(int(result[1]))
-#                    row_to_move = int(input("Enter row to move to:"))
-#                    col_to_move = int(input("Enter col to move to:"))
-#                    if row_to_move not in potential_rows:
-#                        print("You cannot move there!")
-#                        raise ValueError
-#                    if col_to_move not in potential_columns:
-#                        print("You cannot move there!")
-#                        raise ValueError
-#                    takes = self._game._do_move(row, col, row_to_move, col_to_move, take_used, self._game._board, self._game._player)
-#                    row = row_to_move
-#                    col = col_to_move
-#                    if takes != 0:
-#                        print(self._game)
-#                        print("Another Take[s] is available")
-#                        legal_moves, takes = self._game._get_legal_moves(row_to_move, col_to_move, False)
-#                        potential_rows, potential_columns = self.print_out_moves(legal_moves, current_player, row_to_move)
-#                        row_to_move = int(input("Enter row to move to:"))
-#                        col_to_move = int(input("Enter col to move to:"))
-#                        if row_to_move not in potential_rows:
-#                            print("You cannot move there!")
-#                            raise ValueError
-#                        if col_to_move not in potential_columns:
-#                            print("You cannot move there!")
-#                            raise ValueError
-#                        takes = self._game._do_move(row, col, row_to_move, col_to_move, take_used, self._game._board, self._game._player)
-#                        row = row_to_move
-#                        col = col_to_move
-#                        if takes != 0:
-#                            print(self._game)
-#                            print("Another Take[s] is available")
-#                            legal_moves, takes = self._game._get_legal_moves(row, col, False)
-#                            potential_rows, potential_columns = self.print_out_moves(legal_moves, current_player, row)
-#                            row_to_move = int(input("Enter row to move to:"))
-#                            col_to_move = int(input("Enter col to move to:"))
-#                            if row_to_move not in potential_rows:
-#                                print("You cannot move there!") 
-#                                raise ValueError
-#                            if col_to_move not in potential_columns:
-#                                print("You cannot move there!")
-#                                raise ValueError
-#                            takes = self._game._do_move(row, col, row_to_move, col_to_move, take_used, self._game._board, self._game._player)
-#
-#                except GameError:
-#                    print("not your piece to move!")
-#                except ValueError:
-#                    continue
-#            else:
-#                print("Row and column must be within 1 - 8")
-#        print(self._game)
-#        print("Game Finished!")
-#        w = self._game.finished
-#        print(f"The winner was {w}")
-#    
-#    def print_out_moves(self, legal_moves_list, current_player, row):
-#        potential_columns = []
-#        potential_rows = []
-#        for i in legal_moves_list:
-#            result = ""
-#            for num in i:
-#                result += str(num + 1)
-#            if current_player == "Black":
-#                if int(result[0]) == int(row - 2) or int(result[0]) == int(row + 2):
-#                    print(result[0] + "," + result[1])
-#                    potential_rows.append(int(result[0]))
-#                    potential_columns.append(int(result[1]))
-#            else:
-#                if int(result[0]) == int(row + 2) or int(result[0]) == int(row - 2):
-#                    print(result[0] + "," + result[1])
-#                    potential_rows.append(int(result[0]))
-#                    potential_columns.append(int(result[1]))
-#        return potential_rows, potential_columns

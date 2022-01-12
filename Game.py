@@ -27,6 +27,7 @@ class Game:
         self._player = Game.P1
         
     def do_move(self, row, col, row_to_move, col_to_move, take_used, board, player):
+        #Complex user defined algorithm to make a move
         takes = 0
         if player == Game.P1:
             possible = [Game.P1King,Game.P1Man]
@@ -44,6 +45,7 @@ class Game:
             man_or_king = "K"
         if board[row_to_move][col_to_move] not in [Game.POSSIBLEMOVE,Game._EMPTY]:
             raise GameError("Not a move")
+        #if the move is not a take, just change the original square to blank and the new square to the piece
         if take_used == False:
             if board[row][col] != Game._EMPTY:
                 board[row][col] = Game._EMPTY
@@ -52,12 +54,14 @@ class Game:
                 else:
                     board[row_to_move][col_to_move] = Game.P1King if player is Game.P1 else Game.P2King
         else:
+            #otherwise, the algorithm needs to check if there are more takes available, and if there are then it needs to allow the user to make that second take
             if board[row][col] != Game._EMPTY:
                 board[row][col] = Game._EMPTY
                 if man_or_king == "S":
                     board[row_to_move][col_to_move] = Game.P1Man if player is Game.P1 else Game.P2Man
                     board[int((row_to_move + row)/2)][int((col_to_move + col)/2)] = Game._EMPTY
                     try:
+                        # this code statement checks for extra takes
                         if player == Game.P1:
                             _, takes = self.find_black_piece_moves(row_to_move,col_to_move, board)
                         else:
@@ -86,12 +90,14 @@ class Game:
                 else:
                     if row_to_move == 7:
                         takes = []
+        #check for new king and then remove all posible moves from the board
         self.check_for_new_king(player)
         self.remove_possible_moves()
         return takes
 
 
     def check_for_new_king(self, player):
+        #When a counter reaches the final row of the board, then this algorithm changes it to a king
         for row in range(Game._DIM):
                 for col in range(Game._DIM):
                     if player == Game.P1:
@@ -105,17 +111,18 @@ class Game:
 
                             
     def find_white_piece_moves(self, m, n, board):
+        #Finds all the moves possible for a white piece
         available_moves = []
-        available_jumps = []
+        available_takes = []
         if board[m][n] == Game.P2Man:
                     if self._check_white_player_moves(m, n, m + 1, n + 1, board):
                         available_moves.append([m, n, m + 1, n + 1])
                     if self._check_white_player_moves(m, n, m + 1, n - 1, board):
                         available_moves.append([m, n, m + 1, n - 1])
-                    if self._check_white_player_jumps(m, n, m + 1, n - 1, m + 2, n - 2, board):
-                        available_jumps.append([m, n, m + 2, n - 2])
-                    if self._check_white_player_jumps(m, n, m + 1, n + 1, m + 2, n + 2, board):
-                        available_jumps.append([m, n, m + 2, n + 2])
+                    if self._check_white_player_takes(m, n, m + 1, n - 1, m + 2, n - 2, board):
+                        available_takes.append([m, n, m + 2, n - 2])
+                    if self._check_white_player_takes(m, n, m + 1, n + 1, m + 2, n + 2, board):
+                        available_takes.append([m, n, m + 2, n + 2])
         elif board[m][n] == Game.P2King:
                     if self._check_white_player_moves(m, n, m + 1, n + 1, board):
                         available_moves.append([m, n, m + 1, n + 1])
@@ -125,156 +132,170 @@ class Game:
                         available_moves.append([m, n, m - 1, n - 1])
                     if self._check_white_player_moves(m, n, m - 1, n + 1, board):
                         available_moves.append([m, n, m - 1, n + 1])
-                    if self._check_white_player_jumps(m, n, m + 1, n - 1, m + 2, n - 2, board):
-                        available_jumps.append([m, n, m + 2, n - 2])
-                    if self._check_white_player_jumps(m, n, m - 1, n - 1, m - 2, n - 2, board):
-                        available_jumps.append([m, n, m - 2, n - 2])
-                    if self._check_white_player_jumps(m, n, m - 1, n + 1, m - 2, n + 2, board):
-                        available_jumps.append([m, n, m - 2, n + 2])
-                    if self._check_white_player_jumps(m, n, m + 1, n + 1, m + 2, n + 2, board):
-                        available_jumps.append([m, n, m + 2, n + 2])
+                    if self._check_white_player_takes(m, n, m + 1, n - 1, m + 2, n - 2, board):
+                        available_takes.append([m, n, m + 2, n - 2])
+                    if self._check_white_player_takes(m, n, m - 1, n - 1, m - 2, n - 2, board):
+                        available_takes.append([m, n, m - 2, n - 2])
+                    if self._check_white_player_takes(m, n, m - 1, n + 1, m - 2, n + 2, board):
+                        available_takes.append([m, n, m - 2, n + 2])
+                    if self._check_white_player_takes(m, n, m + 1, n + 1, m + 2, n + 2, board):
+                        available_takes.append([m, n, m + 2, n + 2])
 
-        return available_moves, available_jumps
+        return available_moves, available_takes
 
     def find_black_piece_moves(self, m, n, board):
+        #Finds all the moves possible for a black piece
         available_moves = []
-        available_jumps = []
+        available_takes = []
         if board[m][n] == Game.P1Man:
                     if self._check_black_player_moves(m, n, m - 1, n - 1, board):
                         available_moves.append([m, n, m - 1, n - 1])
                     if self._check_black_player_moves(m, n, m - 1, n + 1, board):
                         available_moves.append([m, n, m - 1, n + 1])
-                    if self._check_black_player_jumps(m, n, m - 1, n - 1, m - 2, n - 2, board):
-                        available_jumps.append([m, n, m - 2, n - 2])
-                    if self._check_black_player_jumps(m, n, m - 1, n + 1, m - 2, n + 2, board):
-                        available_jumps.append([m, n, m - 2, n + 2])
+                    if self._check_black_player_takes(m, n, m - 1, n - 1, m - 2, n - 2, board):
+                        available_takes.append([m, n, m - 2, n - 2])
+                    if self._check_black_player_takes(m, n, m - 1, n + 1, m - 2, n + 2, board):
+                        available_takes.append([m, n, m - 2, n + 2])
         elif board[m][n] == Game.P1King:
                     if self._check_black_player_moves(m, n, m - 1, n - 1, board):
                         available_moves.append([m, n, m - 1, n - 1])
                     if self._check_black_player_moves(m, n, m - 1, n + 1, board):
                         available_moves.append([m, n, m - 1, n + 1])
-                    if self._check_black_player_jumps(m, n, m - 1, n - 1, m - 2, n - 2, board):
-                        available_jumps.append([m, n, m - 2, n - 2])
-                    if self._check_black_player_jumps(m, n, m - 1, n + 1, m - 2, n + 2, board):
-                        available_jumps.append([m, n, m - 2, n + 2])
+                    if self._check_black_player_takes(m, n, m - 1, n - 1, m - 2, n - 2, board):
+                        available_takes.append([m, n, m - 2, n - 2])
+                    if self._check_black_player_takes(m, n, m - 1, n + 1, m - 2, n + 2, board):
+                        available_takes.append([m, n, m - 2, n + 2])
                     if self._check_black_player_moves(m, n, m + 1, n - 1, board):
                         available_moves.append([m, n, m + 1, n - 1])
-                    if self._check_black_player_jumps(m, n, m + 1, n - 1, m + 2, n - 2, board):
-                        available_jumps.append([m, n, m + 2, n - 2])
+                    if self._check_black_player_takes(m, n, m + 1, n - 1, m + 2, n - 2, board):
+                        available_takes.append([m, n, m + 2, n - 2])
                     if self._check_black_player_moves(m, n, m + 1, n + 1, board):
                         available_moves.append([m, n, m + 1, n + 1])
-                    if self._check_black_player_jumps(m, n, m + 1, n + 1, m + 2, n + 2, board):
-                        available_jumps.append([m, n, m + 2, n + 2])
+                    if self._check_black_player_takes(m, n, m + 1, n + 1, m + 2, n + 2, board):
+                        available_takes.append([m, n, m + 2, n + 2])
 
-        return available_moves, available_jumps
+        return available_moves, available_takes
         
     def find_white_player_available_moves(self, board):
+        #finds ALL available white moves
         available_moves = []
-        available_jumps = []
+        available_takes = []
         for m in range(8):
             for n in range(8):
-                moves, jumps = self.find_white_piece_moves(m,n,board)
+                moves, takes = self.find_white_piece_moves(m,n,board)
                 for item in moves:
                     available_moves.append(item)
-                for item in jumps:
-                    available_jumps.append(item)
+                for item in takes:
+                    available_takes.append(item)
 
-        if len(available_jumps) != 0:
-            return available_jumps, True
+
+        #returns the valid moves and whether there is a take available 
+        if len(available_takes) != 0:
+            return available_takes, True
         else:
             return available_moves, False
 
         
     def find_black_player_available_moves(self, board):
+        #finds ALL available black moves
         available_moves = []
-        available_jumps = []
+        available_takes = []
         for m in range(8):
             for n in range(8):
-                moves, jumps = self.find_black_piece_moves(m,n,board)
+                moves, takes = self.find_black_piece_moves(m,n,board)
                 for item in moves:
                     available_moves.append(item)
-                for item in jumps:
-                    available_jumps.append(item)
-        if len(available_jumps) != 0:
-            return available_jumps, True
+                for item in takes:
+                    available_takes.append(item)
+
+        #returns the valid moves in a list and whether there is a take available
+        if len(available_takes) != 0:
+            return available_takes, True
         else:
             return available_moves, False
 
     def _check_black_player_moves(self, old_x, old_y, new_x, new_y, board):
+        #checks the pieces move to see if it is valid
         possible = [Game.P1King,Game.P1Man] 
-        if new_x > 7 or new_x < 0:
+        if new_x > 7 or new_x < 0: #if the move brings the piece outside the board, its not valid
             return False
-        if new_y > 7 or new_y < 0:
+        if new_y > 7 or new_y < 0: #same again
             return False
-        if self._board[old_x][old_y] == Game._EMPTY:
+        if board[old_x][old_y] == Game._EMPTY: #if the piece is not actually a piece, move is not valid
             return False
-        if self._board[new_x][new_y] != Game._EMPTY:
+        if board[new_x][new_y] != Game._EMPTY: #if the piece is trying to move to somewhere that is not available to move to, move is not valid
             return False
-        if self._board[old_x][old_y] not in possible:
+        if board[old_x][old_y] not in possible: #if the piece trying to be moved is not the current players piece, it is not valid
             return False
-        if self._board[new_x][new_y] == Game._EMPTY:
+        if board[new_x][new_y] == Game._EMPTY: # if the piece is moving to an empty square, return True because move is valid
             return True
 
     def _check_white_player_moves(self, old_x, old_y, new_x, new_y, board):
+        #checks the pieces move to see if it is valid, see above for info on each if statement
         possible = [Game.P2King,Game.P2Man] 
-        if new_x > 7 or new_x < 0:
+        if new_x > 7 or new_x < 0: 
             return False
         if new_y > 7 or new_y < 0:
             return False
-        if self._board[old_x][old_y] == Game._EMPTY:
+        if board[old_x][old_y] == Game._EMPTY:
             return False
-        if self._board[new_x][new_y] != Game._EMPTY:
+        if board[new_x][new_y] != Game._EMPTY:
             return False
-        if self._board[old_x][old_y] not in possible:
+        if board[old_x][old_y] not in possible:
             return False
-        if self._board[new_x][new_y] == Game._EMPTY:
+        if board[new_x][new_y] == Game._EMPTY:
             return True
 
-    def _check_black_player_jumps(self, old_x, old_y, via_x, via_y, new_x, new_y, board):
+    def _check_black_player_takes(self, old_x, old_y, via_x, via_y, new_x, new_y, board):
+        #checks the take to see if it is valid
         possible = [Game.P1King,Game.P1Man] 
-        if new_x > 7 or new_x < 0:
+        if new_x > 7 or new_x < 0: #validation of take being on board
             return False
         if new_y > 7 or new_y < 0:
             return False
-        if self._board[via_x][via_y] == Game._EMPTY:
+        if board[via_x][via_y] == Game._EMPTY: #if the piece begin taken is not a piece, take is not valid
             return False
-        if self._board[via_x][via_y] in possible:
+        if board[via_x][via_y] in possible: #if the piece being taken is of the same colour as the piece taking it, take is not valid
             return False
-        if self._board[new_x][new_y] != Game._EMPTY:
+        if board[new_x][new_y] != Game._EMPTY: #if the square being moved to is not empty, take is not valid
             return False
-        if self._board[old_x][old_y] == Game._EMPTY:
+        if board[old_x][old_y] == Game._EMPTY: #if the piece being moved is not a piece, take is not valid
             return False
-        if self._board[old_x][old_y] not in possible:
+        if board[old_x][old_y] not in possible: #if the piece being moved is not the current players piece, take is not valid
             return False
-        return True
+        return True #return true if it makes it past all of these
 
-    def _check_white_player_jumps(self, old_x, old_y, via_x, via_y, new_x, new_y, board):
+    def _check_white_player_takes(self, old_x, old_y, via_x, via_y, new_x, new_y, board):
+        #checks the take to see if it is valid, see above for info on each if
         possible = [Game.P2King,Game.P2Man] 
-        if new_x > 7 or new_x < 0:
+        if new_x > 7 or new_x < 0: 
             return False
         if new_y > 7 or new_y < 0:
             return False
-        if self._board[via_x][via_y] == Game._EMPTY:
+        if board[via_x][via_y] == Game._EMPTY:
             return False
-        if self._board[via_x][via_y] in possible:
+        if board[via_x][via_y] in possible:
             return False
-        if self._board[new_x][new_y] != Game._EMPTY:
+        if board[new_x][new_y] != Game._EMPTY:
             return False
-        if self._board[old_x][old_y] == Game._EMPTY:
+        if board[old_x][old_y] == Game._EMPTY:
             return False
-        if self._board[old_x][old_y] not in possible:
+        if board[old_x][old_y] not in possible:
             return False
         return True
 
     def print_possible_moves(self, row, col):
+        #places a green possible move counter on the square given
         self._board[row-1][col-1] = Game.POSSIBLEMOVE
 
     def remove_possible_moves(self):
+        #removes all green possible move counters on the board
         for row in range(8):
             for col in range(8):
                 if self._board[row][col] == Game.POSSIBLEMOVE:
                     self._board[row][col] = Game._EMPTY
 
+    #four functions that each return their designated variable
     def whos_move(self):
         return "Black to move" if self._player is Game.P1 else "White to move"
 
@@ -284,11 +305,11 @@ class Game:
     def return_player(self):
         return self._player
     
-    @staticmethod
     def return_board(self):
         return self._board
 
     def check_for_takes(self):
+        #function that checks the entire board to see if there is a take available
         result = []
         if self._player == Game.P1:
             PossiblePieces = [Game.P1King,Game.P1Man]
@@ -309,6 +330,7 @@ class Game:
 
     @property
     def finished_game(self):
+        #property that checks if the game is finished
         for p in [Game.P1Man,Game.P2Man]:
             fin = True
             for row in range(Game._DIM):

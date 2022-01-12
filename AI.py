@@ -2,6 +2,7 @@ from Player import Player
 from random import randint
 from copy import deepcopy
 from Game import Game
+import math
 
 class AI(Player):
     P1Man = "⚫ "
@@ -9,16 +10,18 @@ class AI(Player):
     P1King = " ♔ "
     P2King = " ♚ "
     _EMPTY = "   "
-    inf = 10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+    inf = math.inf
 
 
     def __init__(self, difficulty, game):
+        #initialising a new AI class
         self._difficulty = difficulty
         self.__piece = [AI.P2Man,AI.P2King]
         self.__colour = "White"
         self.__game = game
 
     def get_move(self, movelist, board):
+        #Depending upon the difficulty, returns a move using either randomisation or evaluating it using minimax
         if self._difficulty == "Easy":
             r = randint(0,len(movelist)-1)
             return movelist[r]
@@ -30,6 +33,7 @@ class AI(Player):
             return move
 
     def calculate_board_worth(self, board):
+        #evaluates the cost of the board
         man = AI.P2Man
         opp_man = AI.P1Man
         king = AI.P2King
@@ -77,33 +81,51 @@ class AI(Player):
         return result + (mine - opp) * 1000
 
     def evaluate_states(self, complexity, board):
-        # PLEASE DONT ASK ME WHATS GOING ON HERE
+        # user-defined algorithm to calculate the best possible move
+        
+        #The current board is used as a starter for a new Node class (deepcopy is used due to bugs found during testing)
         current_state = Node(deepcopy(board))
 
+        #finds all the possible computer moves for the current board
         first_computer_moves = current_state.get_children(True)
         dict = {}
         for i in range(len(first_computer_moves)):
             child = first_computer_moves[i]
+            #each board is used and minimaxed to calculate the best possible outcome
             value = self.minimax(child.get_board(), complexity, -AI.inf, AI.inf, False)
             dict[value] = child 
+        #The maximum score move is returned as the best possible move to make
         move = dict[max(dict)].move
         return move
 
     def minimax(self, board, depth, alpha, beta, maximizing_player):
+        #minimax algorithm to calculate the best possible move for the player to make
+
+        #if the minimax is to go no further, it returns the board worth for the current board
         if depth == 0:
             return self.calculate_board_worth(board)
         current_state = Node(deepcopy(board))
+
+        #if the current player is the one the minimax should be maximising the score of
         if maximizing_player is True:
             max_eval = -AI.inf
+            #iterates through the children in the current board state
             for child in current_state.get_children(True):
+                #recursively calls itself on the child's board state, using a depth one less than the previous depth
                 ev = self.minimax(child.get_board(), depth - 1, alpha, beta, False)
+                #maximum evaluation is set to be max_eval
                 max_eval = max(max_eval, ev)
+
+                #if a board class gets too large, the algorithm cuts out of the for loop
                 alpha = max(alpha, ev)
                 if beta <= alpha:
                     break
+            
+            #sets the value of the current board as the highest score possible
             current_state.set_value(max_eval)
             return max_eval
         else:
+            #otherwise, tries to minimise the score of the opponent
             min_eval = AI.inf
             for child in current_state.get_children(False):
                 ev = self.minimax(child.get_board(), depth - 1, alpha, beta, True)
@@ -117,6 +139,7 @@ class AI(Player):
 
 
 class Node:
+    #Node class for graph of best possible moves
     def __init__(self, board, move=None, parent=None, value=None):
         self.board = board
         self.value = value
@@ -124,9 +147,11 @@ class Node:
         self.parent = parent
 
     def get_children(self, min_player):
+        #uses game functions to calculate all possible moves that a player can make on the current board
         current_state = deepcopy(self.board)
         available_moves = []
         children_states = []
+        #calculate the moves
         if min_player == True:
             available_moves, takes = find_white_player_available_moves(current_state)
             king = Game.P2King
@@ -135,6 +160,7 @@ class Node:
             available_moves, takes = find_black_player_available_moves(current_state)
             king = Game.P1King
             king_row = 0
+        #for each move, performs the move on a copy of the current board and creates a new Node which is set as a child state for the current state
         for i in range(len(available_moves)):
             old_x = available_moves[i][0]
             old_y = available_moves[i][1]
@@ -145,6 +171,8 @@ class Node:
             children_states.append(Node(board_state, [old_x, old_y, new_x, new_y]))
         return children_states
     
+
+    #3 functions to return certain variables/set certain variables
     def get_board(self):
         return self.board
 
@@ -154,18 +182,25 @@ class Node:
     def set_value(self, value):
         self.value = value
 
+
+#######################################################################
+#                                                                     #
+#    Re-paste of game code (necessary due to circular import issues)  #
+#                                                                     #
+#######################################################################
+
 def find_white_piece_moves(m, n, board):
         available_moves = []
-        available_jumps = []
+        available_takes = []
         if board[m][n] == Game.P2Man:
                     if _check_white_player_moves(m, n, m + 1, n + 1, board):
                         available_moves.append([m, n, m + 1, n + 1])
                     if _check_white_player_moves(m, n, m + 1, n - 1, board):
                         available_moves.append([m, n, m + 1, n - 1])
-                    if _check_white_player_jumps(m, n, m + 1, n - 1, m + 2, n - 2, board):
-                        available_jumps.append([m, n, m + 2, n - 2])
-                    if _check_white_player_jumps(m, n, m + 1, n + 1, m + 2, n + 2, board):
-                        available_jumps.append([m, n, m + 2, n + 2])
+                    if _check_white_player_takes(m, n, m + 1, n - 1, m + 2, n - 2, board):
+                        available_takes.append([m, n, m + 2, n - 2])
+                    if _check_white_player_takes(m, n, m + 1, n + 1, m + 2, n + 2, board):
+                        available_takes.append([m, n, m + 2, n + 2])
         elif board[m][n] == Game.P2King:
                     if _check_white_player_moves(m, n, m + 1, n + 1, board):
                         available_moves.append([m, n, m + 1, n + 1])
@@ -175,78 +210,78 @@ def find_white_piece_moves(m, n, board):
                         available_moves.append([m, n, m - 1, n - 1])
                     if _check_white_player_moves(m, n, m - 1, n + 1, board):
                         available_moves.append([m, n, m - 1, n + 1])
-                    if _check_white_player_jumps(m, n, m + 1, n - 1, m + 2, n - 2, board):
-                        available_jumps.append([m, n, m + 2, n - 2])
-                    if _check_white_player_jumps(m, n, m - 1, n - 1, m - 2, n - 2, board):
-                        available_jumps.append([m, n, m - 2, n - 2])
-                    if _check_white_player_jumps(m, n, m - 1, n + 1, m - 2, n + 2, board):
-                        available_jumps.append([m, n, m - 2, n + 2])
-                    if _check_white_player_jumps(m, n, m + 1, n + 1, m + 2, n + 2, board):
-                        available_jumps.append([m, n, m + 2, n + 2])
+                    if _check_white_player_takes(m, n, m + 1, n - 1, m + 2, n - 2, board):
+                        available_takes.append([m, n, m + 2, n - 2])
+                    if _check_white_player_takes(m, n, m - 1, n - 1, m - 2, n - 2, board):
+                        available_takes.append([m, n, m - 2, n - 2])
+                    if _check_white_player_takes(m, n, m - 1, n + 1, m - 2, n + 2, board):
+                        available_takes.append([m, n, m - 2, n + 2])
+                    if _check_white_player_takes(m, n, m + 1, n + 1, m + 2, n + 2, board):
+                        available_takes.append([m, n, m + 2, n + 2])
 
-        return available_moves, available_jumps
+        return available_moves, available_takes
 
 def find_black_piece_moves(m, n, board):
         available_moves = []
-        available_jumps = []
+        available_takes = []
         if board[m][n] == Game.P1Man:
                     if _check_black_player_moves(m, n, m - 1, n - 1, board):
                         available_moves.append([m, n, m - 1, n - 1])
                     if _check_black_player_moves(m, n, m - 1, n + 1, board):
                         available_moves.append([m, n, m - 1, n + 1])
-                    if _check_black_player_jumps(m, n, m - 1, n - 1, m - 2, n - 2, board):
-                        available_jumps.append([m, n, m - 2, n - 2])
-                    if _check_black_player_jumps(m, n, m - 1, n + 1, m - 2, n + 2, board):
-                        available_jumps.append([m, n, m - 2, n + 2])
+                    if _check_black_player_takes(m, n, m - 1, n - 1, m - 2, n - 2, board):
+                        available_takes.append([m, n, m - 2, n - 2])
+                    if _check_black_player_takes(m, n, m - 1, n + 1, m - 2, n + 2, board):
+                        available_takes.append([m, n, m - 2, n + 2])
         elif board[m][n] == Game.P1King:
                     if _check_black_player_moves(m, n, m - 1, n - 1, board):
                         available_moves.append([m, n, m - 1, n - 1])
                     if _check_black_player_moves(m, n, m - 1, n + 1, board):
                         available_moves.append([m, n, m - 1, n + 1])
-                    if _check_black_player_jumps(m, n, m - 1, n - 1, m - 2, n - 2, board):
-                        available_jumps.append([m, n, m - 2, n - 2])
-                    if _check_black_player_jumps(m, n, m - 1, n + 1, m - 2, n + 2, board):
-                        available_jumps.append([m, n, m - 2, n + 2])
+                    if _check_black_player_takes(m, n, m - 1, n - 1, m - 2, n - 2, board):
+                        available_takes.append([m, n, m - 2, n - 2])
+                    if _check_black_player_takes(m, n, m - 1, n + 1, m - 2, n + 2, board):
+                        available_takes.append([m, n, m - 2, n + 2])
                     if _check_black_player_moves(m, n, m + 1, n - 1, board):
                         available_moves.append([m, n, m + 1, n - 1])
-                    if _check_black_player_jumps(m, n, m + 1, n - 1, m + 2, n - 2, board):
-                        available_jumps.append([m, n, m + 2, n - 2])
+                    if _check_black_player_takes(m, n, m + 1, n - 1, m + 2, n - 2, board):
+                        available_takes.append([m, n, m + 2, n - 2])
                     if _check_black_player_moves(m, n, m + 1, n + 1, board):
                         available_moves.append([m, n, m + 1, n + 1])
-                    if _check_black_player_jumps(m, n, m + 1, n + 1, m + 2, n + 2, board):
-                        available_jumps.append([m, n, m + 2, n + 2])
+                    if _check_black_player_takes(m, n, m + 1, n + 1, m + 2, n + 2, board):
+                        available_takes.append([m, n, m + 2, n + 2])
 
-        return available_moves, available_jumps
+        return available_moves, available_takes
         
 def find_white_player_available_moves(board):
         available_moves = []
-        available_jumps = []
+        available_takes = []
         for m in range(8):
             for n in range(8):
-                moves, jumps = find_white_piece_moves(m,n,board)
+                moves, takes = find_white_piece_moves(m,n,board)
                 for item in moves:
                     available_moves.append(item)
-                for item in jumps:
-                    available_jumps.append(item)
+                for item in takes:
+                    available_takes.append(item)
 
-        if len(available_jumps) != 0:
-            return available_jumps, True
+        if len(available_takes) != 0:
+            return available_takes, True
         else:
             return available_moves, False
 
         
 def find_black_player_available_moves(board):
         available_moves = []
-        available_jumps = []
+        available_takes = []
         for m in range(8):
             for n in range(8):
-                moves, jumps = find_black_piece_moves(m,n,board)
+                moves, takes = find_black_piece_moves(m,n,board)
                 for item in moves:
                     available_moves.append(item)
-                for item in jumps:
-                    available_jumps.append(item)
-        if len(available_jumps) != 0:
-            return available_jumps, True
+                for item in takes:
+                    available_takes.append(item)
+        if len(available_takes) != 0:
+            return available_takes, True
         else:
             return available_moves, False
 
@@ -280,7 +315,7 @@ def _check_white_player_moves(old_x, old_y, new_x, new_y, board):
         if board[new_x][new_y] == Game._EMPTY:
             return True
 
-def _check_black_player_jumps(old_x, old_y, via_x, via_y, new_x, new_y, board):
+def _check_black_player_takes(old_x, old_y, via_x, via_y, new_x, new_y, board):
         possible = [Game.P1King,Game.P1Man] 
         if new_x > 7 or new_x < 0:
             return False
@@ -298,7 +333,7 @@ def _check_black_player_jumps(old_x, old_y, via_x, via_y, new_x, new_y, board):
             return False
         return True
 
-def _check_white_player_jumps(old_x, old_y, via_x, via_y, new_x, new_y, board):
+def _check_white_player_takes(old_x, old_y, via_x, via_y, new_x, new_y, board):
         possible = [Game.P2King,Game.P2Man] 
         if new_x > 7 or new_x < 0:
             return False
