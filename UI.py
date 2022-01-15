@@ -2,10 +2,9 @@ from Game import Game, GameError
 from abc import ABC, abstractmethod
 from tkinter import *
 from itertools import product
-from Human import Human
 from AI import AI
 from random import randint as r
-import time
+from database import PlayerDatabase,GamesDatabase
 
 
 #Super Class to GUI
@@ -16,6 +15,9 @@ class UI(ABC):
 
 class GUI(UI):
     def __init__(self):
+        #Initialising the databases
+        self.playersDB = PlayerDatabase()
+        self.gamesDB = GamesDatabase()
         #Initialising the GUI
         self._inprogress = False
         self.__playing_comp = False
@@ -67,12 +69,21 @@ class GUI(UI):
         console.config(yscrollcommand=scroll.set)
         self.__console = console
 
+    def load_saved_game(self):
+        load_saved_game = True
+
     def _play_callback(self):
         #Window for user to input gamemode
 
         #if a game has already begun, do not open this window
         if self.__started == False:
             return
+        
+        if self.load_saved_game:
+            game = self.gamesDB.load_game(self.__user)
+            print(game)
+            return
+
         play_menu = Toplevel(self.__root)
         play_menu.title("Play Menu")
         frame = Frame(play_menu)
@@ -459,42 +470,44 @@ class GUI(UI):
         Label(login, text="Please enter login details below").pack()
         Label(login, text="").pack()
         Label(login, text="Username:").pack()
-        username_entry = Entry(login, textvariable = username)
-        username_entry.pack()
+        self.username_entry = Entry(login, textvariable = username)
+        self.username_entry.pack()
         Label(login, text="Password:").pack()
-        password_entry = Entry(login, textvariable = password, show = "*")
-        password_entry.pack()
+        self.password_entry = Entry(login, textvariable = password, show = "*")
+        self.password_entry.pack()
         Label(login, text="").pack()
         Button(login, text = "Login", width = 10, height = 1, command = self.login_user).pack()
+        self._login = login
 
     def login_user(self):
-        #Searches the login database for the users credentials, if found logs them in if not retrys
-        #DO THIS
-        pass
-
-    def register_user(self):
-        #Registers the user
-        if self.__password_check != password_entry.get():
-            failure = Toplevel(self.__login)
-            failure.title("Sign Up Failure")
-            failure.geometry("300x300")
-            Label(failure, text="Passwords do not match", fg = "red", font = ("Calibri")).pack()
-            command = lambda: [failure.destroy(), self.__password_check == ""]
-            Button(failure, command=command, text = "continue", width = 10, height = 1).pack()
-            
-        user_info = username.get()
-        pass_info = password.get()
-        file = open("C:/Users/alexa/Documents/NEA-Project-2021/userfiles/"+user_info, "w")
-        file.write(str(user_info, pass_info))       
-        file.close()    
-        self._user = Human(user_info)
-        self.__signup.destroy()
-        success = Toplevel(self.__login)
-        success.title("Sign Up Success")
-        success.geometry("200x200")
-        Label(success, text="Registration Success", fg = "green", font = ("Calibri")).pack()
-        Button(success, command=self.__login.destroy, text = "continue", width = 10, height = 1).pack()
+        #Searches the login database for the users credentials, if found logs them in if not allows user to login again
+        loginfail = Toplevel(self._login)
+        loginfail.title("Login Failed")
+        loginfail.geometry("100x50")
+        found = self.playersDB.find_user(self.username_entry.get(),self.password_entry.get())
+        if found == False:
+            Label(loginfail, text="That username does not exist in our database!", fg = "red", font = ("Calibri")).pack()
+            signup = lambda: [self._login.destroy(),loginfail.destroy(),self._signup()]
+            Button(loginfail, command=signup, text = "signup", width = 10, height = 1).pack()
+        self.__user = self.username_entry.get()
         self.__started = True
+        self.__login.destroy()
+
+
+        if self.gamesDB.check_for_saved_game():
+            save = Toplevel(self.__root)
+            save.title("Saved Game")
+            frame = Frame(save)
+            frame.pack()
+            warning = StringVar()
+            warning.set(f"Do you want to load your saved game? If not just close this window")
+            Label(frame, textvariable=warning).pack()
+            com = lambda: [self.load_saved_game,save.destroy()]
+            Button(
+                frame,
+                text='Yes',
+                command= com).pack(fill=X)
+
 
     def _signup(self):
         #Sign Up menu, where player inputs new username/password
@@ -502,29 +515,54 @@ class GUI(UI):
         signup.title("Sign Up")
         signup.geometry("300x250")
 
-        global username
-        global password
-        global username_entry
-        global password_entry
         username = StringVar()
         password = StringVar()
-        self.__password_check = ""
+        password_check = StringVar()
         Label(signup, text="Please enter sign up details below").pack()
         Label(signup, text="").pack()
         Label(signup, text="Username:").pack()
-        username_entry = Entry(signup, textvariable = username)
-        username_entry.pack()
+        self.username_entry = Entry(signup, textvariable = username)
+        self.username_entry.pack()
         Label(signup, text="Password:").pack()
-        password_entry = Entry(signup, textvariable = password)
-        password_entry.pack()
-        password_check = Entry(signup, textvariable = self.__password_check)
-        password_check.pack()
+        self.password_entry = Entry(signup, textvariable = password, show = "*")
+        self.password_entry.pack()
+        Label(signup, text="Re-enter Password:").pack()
+        self.password_check = Entry(signup, textvariable = password_check, show = "*")
+        self.password_check.pack()
         Label(signup, text="").pack()
         Button(signup, text = "Sign Up", width = 10, height = 1, command = self.register_user).pack()
             
-
         self.__signup = signup
 
+    def register_user(self):
+        #Registers the user
+        if self.password_check.get() != self.password_entry.get():
+            failure = Toplevel(self.__login)
+            failure.title("Sign Up Failure")
+            failure.geometry("300x300")
+            Label(failure, text="Passwords do not match", fg = "red", font = ("Calibri")).pack()
+            command = lambda: [failure.destroy()]
+            Button(failure, command=command, text = "continue", width = 10, height = 1).pack()
+            return  
+        user_info = self.username_entry.get()
+        user_info = user_info.strip("(')")
+        pass_info = self.password_entry.get()
+        pass_info = pass_info.strip("(')")
+        created = self.playersDB.create_user(user_info,pass_info)
+        if not created:
+            fail = Toplevel(self.__login)
+            fail.title("Sign Up Failure")
+            fail.geometry("200x200")
+            Label(fail, text="That Username is already in use!", fg = "green", font = ("Calibri")).pack()
+        self.__signup.destroy()
+        if created:
+            success = Toplevel(self.__login)
+            success.title("Sign Up Success")
+            success.geometry("200x200")
+            Label(success, text="Registration Success", fg = "green", font = ("Calibri")).pack()
+            Button(success, command=self.__login.destroy, text = "continue", width = 10, height = 1).pack()
+            self.__user = self.username_entry.get()
+            self.__started = True
 
     def _continue_as_guest(self):
         #If the player does not wish to log in, they can continue as a guest
