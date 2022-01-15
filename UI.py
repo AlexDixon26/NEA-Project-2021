@@ -1,3 +1,4 @@
+from msilib.schema import Billboard
 from Game import Game, GameError
 from abc import ABC, abstractmethod
 from tkinter import *
@@ -69,8 +70,21 @@ class GUI(UI):
         console.config(yscrollcommand=scroll.set)
         self.__console = console
 
-    def load_saved_game(self):
-        load_saved_game = True
+    def save_game(self):
+        boardstr = ""
+        for item in self.__game._board:
+            for square in item:
+                if square == Game._EMPTY:
+                    boardstr += " "
+                    continue
+                boardstr += str(square)
+        board = boardstr
+        comp = self.__playing_comp
+        player = self.__game._player
+        username = self.__user
+
+        self.gamesDB.save_game(str(username),str(board),bool(comp),str(player))
+        self._quit_callback()
 
     def _play_callback(self):
         #Window for user to input gamemode
@@ -79,10 +93,25 @@ class GUI(UI):
         if self.__started == False:
             return
         
-        if self.load_saved_game:
+        if self._load_saved_game == True:
             game = self.gamesDB.load_game(self.__user)
-            print(game)
-            return
+            username = game[0][1]
+            comp = False if game[0][3] == 0 else True
+            player = game[0][4]
+
+            squarenum = 0
+            board = []
+            for square in game[0][2]:
+                if square == " ":
+                    square = Game._EMPTY
+                if squarenum % 8 == 0:
+                    if squarenum != 0:
+                        board.append(line)
+                    line = []
+                line.append(square)
+                squarenum += 1
+
+            print(username, comp, player, board)
 
         play_menu = Toplevel(self.__root)
         play_menu.title("Play Menu")
@@ -223,6 +252,7 @@ class GUI(UI):
         #Menu 
         menubar = Menu(game_window)
         filemenu = Menu(menubar, tearoff=0)
+        filemenu.add_command(label="Save and Exit", command=self.save_game)
         filemenu.add_command(label="Exit", command=self._quit_from_game)
         menubar.add_cascade(label="Menu", menu=filemenu)    
         game_window.config(menu=menubar)
@@ -252,8 +282,23 @@ class GUI(UI):
         frame.pack()
 
         warning = StringVar()
-        warning.set(f"Do you wish to quit the game?") #Save the game function here
+        warning.set(f"Do you wish to save the game?")
         Label(frame, textvariable=warning).pack()
+        Button(
+            frame,
+            text='Save the game then quit',
+            command= self.save_game).pack(fill=X)
+        
+        Button(
+            frame,
+            text='Quit the game without saving',
+            command= self._quit_callback).pack(fill=X)
+        
+        Button(
+            frame,
+            text='Continue Game',
+            command = quit_instructions.destroy).pack(fill=X)
+
 
     def __event_handler(self, eventno, row, col):
         #Algorithm to determine whether the user has just clicked on a piece to check if it is to be moved or whether the user has clicked on a place to move to it
@@ -432,6 +477,7 @@ class GUI(UI):
 
     def login(self):
         #Login TopLevel
+        self._load_saved_game = False
         login = Toplevel(self.__root)
         login.title("Login/Signup")
         login.geometry("300x250")
@@ -481,20 +527,20 @@ class GUI(UI):
 
     def login_user(self):
         #Searches the login database for the users credentials, if found logs them in if not allows user to login again
-        loginfail = Toplevel(self._login)
-        loginfail.title("Login Failed")
-        loginfail.geometry("100x50")
         found = self.playersDB.find_user(self.username_entry.get(),self.password_entry.get())
-        if found == False:
-            Label(loginfail, text="That username does not exist in our database!", fg = "red", font = ("Calibri")).pack()
+        if not found:
+            loginfail = Toplevel(self._login)
+            loginfail.title("Login Failed")
+            loginfail.geometry("300x50")
+            Label(loginfail, text="That username does not exist in our database!", font = ("Calibri")).pack()
             signup = lambda: [self._login.destroy(),loginfail.destroy(),self._signup()]
             Button(loginfail, command=signup, text = "signup", width = 10, height = 1).pack()
+            return
         self.__user = self.username_entry.get()
         self.__started = True
         self.__login.destroy()
 
-
-        if self.gamesDB.check_for_saved_game():
+        if self.gamesDB.check_for_saved_game(self.__user):
             save = Toplevel(self.__root)
             save.title("Saved Game")
             frame = Frame(save)
@@ -502,12 +548,15 @@ class GUI(UI):
             warning = StringVar()
             warning.set(f"Do you want to load your saved game? If not just close this window")
             Label(frame, textvariable=warning).pack()
-            com = lambda: [self.load_saved_game,save.destroy()]
             Button(
                 frame,
                 text='Yes',
-                command= com).pack(fill=X)
+                command = self.load_game_and_finish).pack(fill=X)
+            self.save = save
 
+    def load_game_and_finish(self):
+        self._load_saved_game = True
+        self.save.destroy()
 
     def _signup(self):
         #Sign Up menu, where player inputs new username/password
@@ -554,7 +603,6 @@ class GUI(UI):
             fail.title("Sign Up Failure")
             fail.geometry("200x200")
             Label(fail, text="That Username is already in use!", fg = "green", font = ("Calibri")).pack()
-        self.__signup.destroy()
         if created:
             success = Toplevel(self.__login)
             success.title("Sign Up Success")

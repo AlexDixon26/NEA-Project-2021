@@ -37,7 +37,7 @@ class GamesDatabase:
     def __init__(self):
         self._con = sqlite3.connect("games.db")
         self._cursor = self._con.cursor()
-        self._cursor.execute("CREATE TABLE IF NOT EXISTS games(id integer PRIMARY KEY, username text, board text, computer boolean)")   
+        self._cursor.execute("CREATE TABLE IF NOT EXISTS games(id integer PRIMARY KEY, username text, board text, computer boolean, player text)")   
         self._con.commit()
 
     def read_Data(self):
@@ -45,23 +45,23 @@ class GamesDatabase:
         results = self._cursor.fetchall()
         return results
 
-    def save_game(self, username, board, comp):
+    def save_game(self, username, board, comp, player):
         self._cursor.execute("SELECT username FROM games WHERE username = (?) ",(username,))
         names = self._cursor.fetchall()
         if names != []:
             self._cursor.execute("DELETE FROM games WHERE username = (?)", (username,))
             self._con.commit()
-        self._cursor.execute("INSERT INTO games(username, board, computer) VALUES (?,?,?)",(username,board,comp,))
+        self._cursor.execute("INSERT INTO games(username, board, computer, player) VALUES (?,?,?,?)",[username,board,comp,player,])
         self._con.commit()
 
     def check_for_saved_game(self, username):
-        self._cursor.execute("SELECT username FROM games WHERE username = (?) ",(username,))
+        self._cursor.execute("SELECT * FROM games WHERE username = (?) ",(username,))
         names = self._cursor.fetchall()
         if names != []:
             return True
         return False
 
     def load_game(self, username):
-        self._cursor.execute("SELECT username FROM games WHERE username = (?) ",(username,))
+        self._cursor.execute("SELECT * FROM games WHERE username = (?) ",(username,))
         names = self._cursor.fetchall()
         return names
