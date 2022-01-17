@@ -76,14 +76,18 @@ class GUI(UI):
             for square in item:
                 if square == Game._EMPTY:
                     boardstr += " "
-                    continue
-                boardstr += str(square)
+                else:
+                    boardstr += str(square)
         board = boardstr
         comp = self.__playing_comp
         player = self.__game._player
         username = self.__user
+        if comp:
+            difficulty = self._difficulty
+        else:
+            difficulty = "none"
 
-        self.gamesDB.save_game(str(username),str(board),bool(comp),str(player))
+        self.gamesDB.save_game(str(username),str(board),bool(comp),str(player),str(difficulty))
         self._quit_callback()
 
     def _play_callback(self):
@@ -95,7 +99,6 @@ class GUI(UI):
         
         if self._load_saved_game == True:
             game = self.gamesDB.load_game(self.__user)
-            username = game[0][1]
             comp = False if game[0][3] == 0 else True
             player = game[0][4]
 
@@ -110,8 +113,16 @@ class GUI(UI):
                     line = []
                 line.append(square)
                 squarenum += 1
+            board.append(line)
 
-            print(username, comp, player, board)
+            self._takes = []
+            self.__console.delete("1.0", END)
+            #creates a new game class
+            self.__game = Game(board, player)
+            self.__inprogress = True
+            self.__finished = False
+            self._print_board()
+            return
 
         play_menu = Toplevel(self.__root)
         play_menu.title("Play Menu")
@@ -136,7 +147,6 @@ class GUI(UI):
         #if a game is in progress, do not open this window
         if self._inprogress:
             return
-        self._inprogress = True
         difficulty = ""
         self.play_computer = Toplevel(self.__root)
         self.play_computer.title("Choose Computer Difficulty")
@@ -171,6 +181,7 @@ class GUI(UI):
 
     def computer_versus(self,difficulty):
         #Function that prints the board to play against the computer
+        self._difficulty = difficulty
         self.play_computer.destroy()
         self._takes = []
 
@@ -182,7 +193,7 @@ class GUI(UI):
         self.__game = Game()
 
         #Creates a new computer opponent
-        self._Computer = AI(difficulty, self.__game)
+        self._Computer = AI(difficulty)
         self.__finished = False
         self._computer_piece = "White"
         self._print_board()
@@ -228,7 +239,6 @@ class GUI(UI):
         #Function for printing the board when playing player versus player
         if self._inprogress:
             return
-        self._inprogress = True
         self._play_menu.destroy()
         self._takes = []
         self.__console.delete("1.0", END)
@@ -239,6 +249,7 @@ class GUI(UI):
     
     def _print_board(self):
         #Function to print the board
+        self._inprogress = True
         game_window = Toplevel(self.__root)
         game_window.title("Draughts Board")
         frame = Frame(game_window)
@@ -252,7 +263,8 @@ class GUI(UI):
         #Menu 
         menubar = Menu(game_window)
         filemenu = Menu(menubar, tearoff=0)
-        filemenu.add_command(label="Save and Exit", command=self.save_game)
+        if not self.__playing_comp and self.__user != "":
+            filemenu.add_command(label="Save and Exit", command=self.save_game)
         filemenu.add_command(label="Exit", command=self._quit_from_game)
         menubar.add_cascade(label="Menu", menu=filemenu)    
         game_window.config(menu=menubar)
@@ -282,12 +294,13 @@ class GUI(UI):
         frame.pack()
 
         warning = StringVar()
-        warning.set(f"Do you wish to save the game?")
+        warning.set(f"How do you wish to quit the game?")
         Label(frame, textvariable=warning).pack()
-        Button(
-            frame,
-            text='Save the game then quit',
-            command= self.save_game).pack(fill=X)
+        if not self.__playing_comp and self.__user != "":
+            Button(
+                frame,
+                text='Save the game then quit',
+                command= self.save_game).pack(fill=X)
         
         Button(
             frame,
@@ -385,17 +398,17 @@ class GUI(UI):
     def _text_to_image(self, row, col):
         #changes each character piece in the board to an image 
         b = self.__game.at(row,col)
-        if b == "⚫ ":
+        if b == Game.P1Man:
             img = self._BLACKCOUNTER
-        elif b == "⚪ ":
+        elif b == Game.P2Man:
             img = self._WHITECOUNTER
-        elif b == " ♔ ":
+        elif b == Game.P1King:
             img = self._BLACKKING
-        elif b == " ♚ ":
+        elif b == Game.P2King:
             img = self._WHITEKING
-        elif b == "🟢":
+        elif b == Game.POSSIBLEMOVE:
             img = self._POSSIBLEMOVE
-        elif b == "   ":
+        elif b == Game._EMPTY:
             img = self._BLANKSQUARE
         else:
             GameError()
@@ -449,11 +462,6 @@ class GUI(UI):
 
         self._update_board()
 
-
-
-        if take != 0:
-            self.__console.insert(END,"Another take is available\n")
-
         #checks if game won
         if self.__game.finished_game is not None:
             self.__finished = True
@@ -466,6 +474,7 @@ class GUI(UI):
             Message(finished_game,text=finished_text).pack(fill=X)
             Button(finished_game, text="Dismiss",command=finished_game.destroy).pack(fill=X)
             self.__game_win.destroy()
+            return
 
         if self.__playing_comp == True and self.__game._player == self._computer_piece:
                 self.__make_ai_move()
@@ -477,6 +486,7 @@ class GUI(UI):
 
     def login(self):
         #Login TopLevel
+        self.__user = ""
         self._load_saved_game = False
         login = Toplevel(self.__root)
         login.title("Login/Signup")

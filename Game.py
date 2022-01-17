@@ -13,22 +13,22 @@ class Game:
     P2 = "White"
 
 
-    P1Man = "⚫ "
-    P2Man = "⚪ "
-    P1King = " ♔ "
-    P2King = " ♚ "
+    P1Man = "⚫"
+    P2Man = "⚪"
+    P1King = "♔"
+    P2King = "♚"
     POSSIBLEMOVE = "🟢"
 
     _DIM = 8
     _EMPTY = "   "
 
        
-    def __init__(self, board=None):
+    def __init__(self, board=None, player=None):
         default_board = [[Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man],[Game.P2Man,Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man,Game._EMPTY],[Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man],[Game._EMPTY]*Game._DIM,[Game._EMPTY]*Game._DIM,[Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY],[Game._EMPTY,Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY,Game.P1Man],[Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY]]
         if board == None:
             board = default_board
         self._board = board
-        self._player = Game.P1
+        self._player = player if player != None else Game.P1
         
     def do_move(self, row, col, row_to_move, col_to_move, take_used, board, player):
         #Complex user defined algorithm to make a move

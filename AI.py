@@ -13,12 +13,11 @@ class AI(Player):
     inf = math.inf
 
 
-    def __init__(self, difficulty, game):
+    def __init__(self, difficulty):
         #initialising a new AI class
         self._difficulty = difficulty
         self.__piece = [AI.P2Man,AI.P2King]
         self.__colour = "White"
-        self.__game = game
 
     def get_move(self, movelist, board):
         #Depending upon the difficulty, returns a move using either randomisation or evaluating it using minimax
