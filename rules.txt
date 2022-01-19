@@ -1,0 +1,17 @@
+Draughts is played on a 64 square checkerboard with eight rows of alternating dark and light coloured squares.
+
+There are two players and each begins the game with 12 draughts, each player having their own colour (black/white).
+
+The players play the game with their draughts always on the dark squares.
+
+The players make one move at a time, moving diagonally in their chosen direction, into an empty square.
+
+If an opponent's piece is in the square diagonally next to a piece, the opponent's piece can be captured by jumping over it.
+
+If there is another piece they can then jump over, they can jump over it.
+
+Players cannot jump over their own pieces.
+
+When a piece reaches the final column of the board, it becomes a king. It will then be able to move forwards and backward, as well as take forwards an backwards.
+
+The game ends when one player loses all of their pieces.

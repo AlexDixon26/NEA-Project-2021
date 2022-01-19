@@ -224,9 +224,12 @@ class GUI(UI):
         frame = Frame(help_instructions)
         frame.pack()
 
-        rules = StringVar()
-        rules.set(f"If you click on a peice and then change your mind, click on the same peice again to deselect it!")
-        rulesLabel = Label(frame, textvariable=rules).pack()
+        with open("rules.txt", "r") as f:
+            flist = f.readlines()
+            for item in flist:
+                rules = StringVar()
+                rules.set(str(item))
+                rulesLabel = Label(frame, textvariable=rules).pack()
 
     def _quit_callback(self):
         #Quits the main program
@@ -465,12 +468,15 @@ class GUI(UI):
         #checks if game won
         if self.__game.finished_game is not None:
             self.__finished = True
-            self.__console.insert(END, f"The winner was {self.__game.finished_game}\n")
+            if self.__game.finished_game != "Draw":
+                self.__console.insert(END, f"The winner was {self.__game.finished_game}\n")
+            else:
+                self.__console.insert(END,f"The game was a Draw!")
             self.__winner = self.__game.finished_game
             finished_game = Toplevel()
             finished_game.title("Game Finished")
             frame = Frame(finished_game)
-            finished_text = f"Winner was: {self.__winner}"
+            finished_text = f"Winner was: {self.__winner}" if self.__winner != "Draw" else "The game was a Draw!"
             Message(finished_game,text=finished_text).pack(fill=X)
             Button(finished_game, text="Dismiss",command=finished_game.destroy).pack(fill=X)
             self.__game_win.destroy()

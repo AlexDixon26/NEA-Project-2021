@@ -334,6 +334,7 @@ class Game:
 
     @property
     def finished_game(self):
+        draw = False
         #property that checks if the game is finished
         for p in [Game.P1Man,Game.P2Man]:
             fin = True
@@ -353,16 +354,17 @@ class Game:
                             break
                     if fin == False:
                         break
-                
-                if fin == True:
-                    return Game.P2 if p is Game.P1Man else Game.P1
-                return None
-    
-    def __repr__(self):
-        result = "  " + " ".join(str(i+1)+"  " for i in range(Game._DIM))
-        for row in range(Game._DIM):
-            result += f"\n{row+1} " + "|".join(self._board[row])
-            if row != Game._DIM - 1:
-                dashes = "--" * (2 * Game._DIM - 1)
-                result += f"\n  {dashes}"
-        return result
+
+        if fin == False:
+            check, _ = self.find_black_player_available_moves(self._board)
+            check2, _ = self.find_white_player_available_moves(self._board)
+            if check == [] and check2 == []:
+                fin = True
+                draw = True
+                        
+        if fin == True:
+            if not draw:
+                return Game.P2 if p is Game.P1Man else Game.P1
+            else:
+                return "Draw"
+        return None
