@@ -22,6 +22,11 @@ class Game:
     _DIM = 8
     _EMPTY = "   "
 
+    #######################################################################
+    #                                                                     #
+    #              (A5) Use of Object Oriented Programming                #
+    #                                                                     #
+    #######################################################################
        
     def __init__(self, board=None, player=None):
         default_board = [[Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man],[Game.P2Man,Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man,Game._EMPTY],[Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man,Game._EMPTY,Game.P2Man],[Game._EMPTY]*Game._DIM,[Game._EMPTY]*Game._DIM,[Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY],[Game._EMPTY,Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY,Game.P1Man],[Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY,Game.P1Man,Game._EMPTY]]
@@ -30,6 +35,12 @@ class Game:
         self._board = board
         self._player = player if player != None else Game.P1
         
+    #######################################################################
+    #                                                                     #
+    #            (A2) Complex User-Defined Algorithm                      #
+    #                                                                     #
+    #######################################################################
+
     def do_move(self, row, col, row_to_move, col_to_move, take_used, board, player):
         #Complex user defined algorithm to make a move
         takes = 0
@@ -116,6 +127,13 @@ class Game:
                             
     def find_white_piece_moves(self, m, n, board):
         #Finds all the moves possible for a white piece
+
+        #######################################################################
+        #                                                                     #
+        #                        (A4) List Operations                         #
+        #                                                                     #
+        #######################################################################
+
         available_moves = []
         available_takes = []
         if board[m][n] == Game.P2Man:
@@ -219,6 +237,13 @@ class Game:
             return available_moves, False
 
     def _check_black_player_moves(self, old_x, old_y, new_x, new_y, board):
+
+        #######################################################################
+        #                                                                     #
+        #                 (B3) Simple User Defined Algorithm                  #
+        #                                                                     #
+        #######################################################################
+
         #checks the pieces move to see if it is valid
         possible = [Game.P1King,Game.P1Man] 
         if new_x > 7 or new_x < 0: #if the move brings the piece outside the board, its not valid

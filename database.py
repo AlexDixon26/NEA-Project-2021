@@ -3,6 +3,13 @@ import sqlite3
 
 class PlayerDatabase:
     def __init__(self):
+
+        #######################################################################
+        #                                                                     #
+        #                       (B2) Non - Parameterised SQL                  #
+        #                                                                     #
+        #######################################################################
+
         self._con = sqlite3.connect("players.db")
         self._cursor = self._con.cursor()
         self._cursor.execute("CREATE TABLE IF NOT EXISTS users(id integer PRIMARY KEY, username text, userpass text)")   

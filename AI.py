@@ -97,6 +97,12 @@ class AI(Player):
         move = dict[max(dict)].move
         return move
 
+    #######################################################################
+    #                                                                     #
+    #      (A1) Recursive Algorithms and (B1) Dictionaries                #
+    #                                                                     #
+    #######################################################################
+
     def minimax(self, board, depth, alpha, beta, maximizing_player):
         #minimax algorithm to calculate the best possible move for the player to make
 
@@ -144,6 +150,12 @@ class Node:
         self.value = value
         self.move = move
         self.parent = parent
+
+    #######################################################################
+    #                                                                     #
+    #                          (A3) Use of a Tree                         #
+    #                                                                     #
+    #######################################################################
 
     def get_children(self, min_player):
         #uses game functions to calculate all possible moves that a player can make on the current board
