@@ -218,6 +218,9 @@ class GUI(UI):
         self._turn.set(f"Turn: {self.__game._player}")
 
     def _help_callback(self):
+        if self.__started == False:
+            return
+
         #Main window for the rules and help class
         help_instructions = Toplevel(self.__root)
         help_instructions.title("Rules")
