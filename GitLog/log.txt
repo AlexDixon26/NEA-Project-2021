@@ -1,0 +1,389 @@
+commit 0647a708f48d772974ca6cdafc3959e62bd2996e
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Thu Jan 20 11:41:30 2022 +0000
+
+    Added more comments - now i promise its finished
+
+commit 9d4d742273d389a1a354187a020025288d94e8c0
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Wed Jan 19 16:50:51 2022 +0000
+
+    sike now its fully finished
+
+commit 1cd2448b330dddd07e2fcbe5b303c91a5631a6c2
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Mon Jan 17 17:11:39 2022 +0000
+
+    Game Fully Finished
+
+commit 81f114dd67805ed23a19c7721ea114df9e2c5aa5
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Sat Jan 15 12:09:39 2022 +0000
+
+    implemented save game and implememnting load game
+
+commit 6e20947ac0413abb5b6730feaad25d18cc6a3d3b
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Sat Jan 15 10:58:51 2022 +0000
+
+    implementing saved game
+
+commit 36d8e4d3053f727f89a13008892d0e5455805783
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Wed Jan 12 09:38:08 2022 +0000
+
+    commenting and beautifying the file structure
+
+commit 537884f9e88bd5f148d464e1828baf2cf961b55a
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Mon Jan 10 10:01:23 2022 +0000
+
+    undid some changes made yesterday
+
+commit cd41845a1a56de9e7a8a49118a7c668531bbf3a0
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Sun Jan 9 11:55:56 2022 +0000
+
+    testing databases
+
+commit 3be2a026d445ce1ea69383883b85af0bd27fc641
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Sun Jan 9 10:00:32 2022 +0000
+
+    Fully implemented ai & fixed bug
+
+commit 5cf9c8277dcda39b8ed5cec6ad53183d74e94291
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Sat Jan 8 13:08:44 2022 +0000
+
+    finished board cost-untested & ai logic no minimax
+
+commit 8bd951cc16b51c0d0de2e1d56eb7c51696d64f20
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Sat Jan 8 11:52:31 2022 +0000
+
+    simple non-functioning Tree for AI code n/f
+
+commit 499b83bc32cc59d146245a645480431fb6e4b2e4
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Sat Jan 8 11:11:16 2022 +0000
+
+    board worth calculator completed
+
+commit e68f6ab7313415b9222ba6a6b7a6975d8b502dfc
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Sat Jan 8 10:33:49 2022 +0000
+
+    added in ability to ue custom board to check moves
+
+commit df2cf2b94fb58f846fcd266717bf00619d0a3226
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Fri Jan 7 18:53:20 2022 +0000
+
+    fully implemented easy AI
+
+commit e8eca9358656089420a9059cf9a40c346b105b7e
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Fri Jan 7 10:41:21 2022 +0000
+
+    fully implemented easy ai
+
+commit b8806551729b21b604d9077391a5dcc530f73856
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Fri Jan 7 08:51:50 2022 +0000
+
+    implemented easy AI
+
+commit 5f2dcac90e23119260130d1e0b608cc29383acc1
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Thu Jan 6 19:02:32 2022 +0000
+
+    allowing ai to check all available moves for it
+
+commit 81d994e34b9a7bc90ceae8cdcf3bb03110196c69
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Thu Jan 6 18:59:28 2022 +0000
+
+    added finding multipe takes
+
+commit 77850951b5576c636d817235f83fdf49ee4d6944
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Thu Jan 6 11:36:10 2022 +0000
+
+    checking all legal moves
+
+commit 313d0eb11edc6493e8663796e7b45120ee410fbd
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Mon Jan 3 12:50:29 2022 +0000
+
+    computer oponent implementation
+
+commit 8c28e30923ab931b56bb535fc187e39c4a8e3363
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Mon Jan 3 12:50:19 2022 +0000
+
+    implementing computer opponenet
+
+commit 864f207a0b03af4f57a49f757db4d1f15786e193
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Sun Jan 2 15:52:11 2022 +0000
+
+    computer versus
+
+commit b79e5c9282646368c83b4be0c66e9cf4caf5ffed
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Sun Jan 2 15:45:06 2022 +0000
+
+    computer player
+
+commit f1be7ae098946a716dfa6521a2aeb561320c0d1b
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Fri Dec 17 19:21:09 2021 +0000
+
+    Began implementing AI
+
+commit 74d97a5c0910861d360ee651c2b96f60247e9791
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Mon Nov 29 10:26:56 2021 +0000
+
+    documentation
+
+commit 820a60d06aab7b9dde05f6c2c8e5a74abf3047b7
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Thu Nov 25 12:22:29 2021 +0000
+
+    another commit for documentation
+
+commit 2389c08fd70f09bccd531b884ee0e22d144f8f3d
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Thu Nov 25 12:21:57 2021 +0000
+
+    commit for Documentation
+
+commit 5c8109bb9de251e59027591cf1d0fe5bb39db5d4
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Thu Nov 11 12:33:46 2021 +0000
+
+    validation for registering, MAY NOT WORK
+
+commit 7c6031bc71c9af64dd5318fc6d22baa2445878dc
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Thu Nov 11 12:18:38 2021 +0000
+
+    finished register user - began login & human.py
+
+commit b0b93f8a977a35c02ff6a644ef910292be0b1c48
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Mon Nov 8 11:20:31 2021 +0000
+
+    Started Login System
+
+commit c2e3a436ebd492de4e72c9c8d616ed842b59f765
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Thu Oct 21 12:30:31 2021 +0100
+
+    fixed issue with toplevels
+
+commit 240e0cfe065a1330070edd90c8100aab56fd9d6e
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Thu Oct 21 12:30:04 2021 +0100
+
+    Fixed issue with Toplevels and Roots
+
+commit ee9d35dcd314503fecf44d62c3a1b8eb317eff29
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Thu Oct 21 12:13:22 2021 +0100
+
+    added login system (only guest continue is func.)
+
+commit 0768a4ea1ed7a56c3b90cc091aa18a0425052153
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Thu Oct 21 11:41:55 2021 +0100
+
+    commit 21/10
+
+commit ec1d14717d591f4dee89b5346464991cc0e717b5
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Fri Oct 15 09:55:22 2021 +0100
+
+    Added Create/Join buttons(non-functioning buttons)
+
+commit 130a3842d182e811d654e18fa9455d5935a9004d
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Wed Oct 13 16:09:00 2021 +0100
+
+    improved images for peices
+
+commit 85c0f111a4d24785b57e09cc66691887375403a2
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Wed Oct 13 09:48:27 2021 +0100
+
+    changed the game to use images instead of text
+
+commit f7847a3955712cc77a4b2cd86641a67d6b2f02b2
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Tue Oct 12 12:46:41 2021 +0100
+
+    begun using images for counters
+
+commit 31013786502fa4673af8a71b818a2d3f35356c1d
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Tue Oct 12 12:25:35 2021 +0100
+
+    game working + choice of type of game
+
+commit 3d9bfe955286f55439259c05495e2f8b9f4ed52b
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Tue Oct 12 11:54:49 2021 +0100
+
+    12/10 intial
+
+commit 719d826d6f231cce36f40c53e4ab8884e02ef7ba
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Thu Sep 9 12:39:59 2021 +0100
+
+    finished forcing of takes
+
+commit 526931d7eea97ece658c011a16e8ec1a42fd39ae
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Thu Sep 9 11:57:00 2021 +0100
+
+    fixed forcing moves
+
+commit 7f7749b3d4157e2c7026bcb64bb62a56498a7bec
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Thu Sep 2 11:04:31 2021 +0100
+
+    forcing takes (not working yet) & off board taking
+
+commit 1aae8d22e380bf142a058bc16035b957825bd517
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Fri Aug 27 17:14:55 2021 +0100
+
+    Fixed touch peice and clear console
+
+commit de2e6f663ea7b6a4dd96bdd64b008a74f834b839
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Thu Aug 26 14:18:44 2021 +0100
+
+    fixed mismove penalty and turn counter
+
+commit 4f5e1e131997aa57c0c1f47b4377ddb4ef432b1b
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Tue Aug 24 17:59:52 2021 +0100
+
+    Fixed Taking and GUI
+
+commit ac80ce0f8ae045207868c34bc068095f2978f9a6
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Wed Aug 11 16:34:19 2021 +0200
+
+    Implementing GUI(not working yet)
+
+commit e0b1460463e3d42a740bc812d85459303349e227
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Mon Aug 9 16:59:05 2021 +0200
+
+    started GUI
+
+commit 9f8c2a380acfadb9fe37f4db03f528c2516691dd
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Mon Aug 9 15:44:55 2021 +0200
+
+    Moved run message to new file
+
+commit 70a68a71855400175191c095d3c6762f21044bc0
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Sun Aug 8 10:58:21 2021 +0200
+
+    finished terminal
+
+commit ba8ac9df5fa29015fcf47adfe808de7a5325912f
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Sun Aug 8 10:58:03 2021 +0200
+
+    Finished Terminal
+
+commit 6c13fe773b73fcdd989d59d7ebd99412e9cf000b
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Sat Aug 7 10:38:39 2021 +0200
+
+    removed possible to take on last row
+
+commit e8e110a4adb6e2f354f7c82cd1adab0cc427fd84
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Sat Aug 7 10:36:05 2021 +0200
+
+    finshing terminal
+
+commit d315fe0a986b8bc23eeb924a231710e6a1f7d54b
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Thu Aug 5 16:18:41 2021 +0200
+
+    created board with pieces in correct pos
+
+commit 8b9e34a6f44645d730d96ec23dc177ea85805b02
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Thu Aug 5 16:17:18 2021 +0200
+
+    Fixed bugs + Added capturing piece
+
+commit 9053f29b13deffe8e3c8e775bc4d45c43cdb10eb
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Mon Aug 2 15:38:38 2021 +0200
+
+    adding king piece
+
+commit e071dd80033bf35c4dba3e4ff929b7c1c758df8e
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Sun Aug 1 15:42:43 2021 +0200
+
+    do_move properly implemented
+
+commit d49bfffcf666d5338d4e57781b61b62ae6268530
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Sun Aug 1 15:20:51 2021 +0200
+
+    Updated board to have pieces on to start with
+
+commit c6e27eb4fd85dcc8e7493c5a1e2448f88381df59
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Sat Jul 31 11:21:41 2021 +0200
+
+    repr for Game class complete
+
+commit 60640e5ec189a01b511d1f11af5bc5a3d0f6b8c9
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Sat Jul 31 11:21:10 2021 +0200
+
+    repr for Game class complete
+
+commit 6b73bee4d72bb426dde579080ac8d3f2639d8575
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Sat Jul 31 11:10:17 2021 +0200
+
+    do_move functino & Exception GameError
+
+commit 2a519ff83a437ccace318f7f0d65834340a1e298
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Sat Jul 31 10:34:06 2021 +0200
+
+    Changed GUI to be inside Ui
+
+commit dcd122ec22e55310ff25aa985c05218bab6c636f
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Thu Jul 15 10:49:10 2021 +0100
+
+    Objective 11
+
+commit f10418d2348117a485e8d4a141d9ef0f2b2df164
+Author: Alex Dixon <alexanderdixon267@gmail.com>
+Date:   Thu Jul 15 10:38:58 2021 +0100
+
+    Initial Commit
+
+commit eafce3691405d4f380c396a293f8523a4a9c489a
+Author: AlexDixon26 <52078232+AlexDixon26@users.noreply.github.com>
+Date:   Tue Jul 6 09:17:52 2021 +0100
+
+    Initial commit

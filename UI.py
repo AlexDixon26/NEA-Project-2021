@@ -252,6 +252,7 @@ class GUI(UI):
     
     def _print_board(self):
         #Function to print the board
+        self.__count = 0
         self._inprogress = True
         game_window = Toplevel(self.__root)
         game_window.title("Draughts Board")
@@ -274,10 +275,20 @@ class GUI(UI):
 
         #printing the board
         for row, col in product(range(0,8), range(0,8)):
+            if row in [0,2,4,6]:
+                if col in [1,3,5,7]:
+                    colour = "black"
+                else:
+                    colour = "white"
+            else:
+                if col in [0,2,4,6]:
+                    colour = "black"
+                else:
+                    colour = "white"
             img = self._text_to_image(row, col)
             cmd = lambda r=row, c=col: self.__event_handler(self._eventno, r, c)
         
-            button = Button(frame,image=img,command=cmd)
+            button = Button(frame,image=img,command=cmd,bg=colour)
             button.grid(row=row,column=col,sticky=N+S+W+E)
             self.__buttons[row][col] = button
 
@@ -327,6 +338,7 @@ class GUI(UI):
             self._eventno = 2
             self.__check_poss_moves(row, col)
         elif eventno == 2:
+            self.__count = 0
             if self._row_of_curr == row and self._col_of_curr == col:
                 self.__remove_poss()
                 return
@@ -355,22 +367,7 @@ class GUI(UI):
         succeed = False
         if self.__finished:
             return
-        # Creates a list of all possible moves
-        for move in self._takes:
-            strmove = ""
-            for num in move:
-                strmove += str(num)
-            movelist.append(strmove)
-        for item in movelist:
-            if row == int(item[0])-1 and col == int(item[1])-1:
-                succeed = True
-            
-        #checks if the piece is able to move
-        if succeed == False and self._takes != []:
-            self._eventno = 1
-            self.__console.insert(END, "This peice cannot move, because there are takes available elsewhere\n")
-            return
-
+    
         #Uses game classes to calculate possible moves for the piece to make
         try:
             if self.__game._player == Game.P1:
@@ -389,6 +386,16 @@ class GUI(UI):
             list = moves
         
         if list == []:
+            self.__count += 1
+            if self.__count > 1:
+                q = Toplevel(self.__root)
+                q.title("Take Available!")
+                frame = Frame(q)
+                frame.pack()
+
+                warning = StringVar()
+                warning.set(f"There's a take available somewhere!")
+                Label(frame, textvariable=warning).pack()
             self._eventno = 1
 
         #adds the move to a list of possible moves that the do move function uses
