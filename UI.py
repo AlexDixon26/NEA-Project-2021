@@ -397,7 +397,7 @@ class GUI(UI):
                 frame.pack()
 
                 warning = StringVar()
-                warning.set(f"There's a take available somewhere!")
+                warning.set(f"This piece cannot move!")
                 Label(frame, textvariable=warning).pack()
             self._eventno = 1
 
