@@ -119,7 +119,7 @@ class GUI(UI):
             self.__console.delete("1.0", END)
             #creates a new game class
             self.__game = Game(board, player)
-            self.__inprogress = True
+            self._inprogress = True
             self.__finished = False
             self._print_board()
             return
@@ -200,10 +200,7 @@ class GUI(UI):
     
     def __make_ai_move(self):
         #function to make the computer player move
-        results = 0
-        takes = 0
-        play = lambda: [results, takes == self.__game.find_white_player_available_moves(self.__game._board)]
-        self.__game_win.after(500, play)
+        results, takes = self.__game.find_white_player_available_moves(self.__game._board)
         move = self._Computer.get_move(results, self.__game._board)
 
         old_x = move[0]
@@ -477,6 +474,8 @@ class GUI(UI):
 
         #checks if game won
         if self.__game.finished_game is not None:
+            self.__started = True
+            self._inprogress = False
             self.__finished = True
             if self.__game.finished_game != "Draw":
                 self.__console.insert(END, f"The winner was {self.__game.finished_game}\n")
